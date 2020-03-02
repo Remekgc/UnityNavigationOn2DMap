@@ -4,9 +4,12 @@ using UnityEngine;
 using MySql.Data.MySqlClient;
 using MySql.Data;
 using System;
+using TMPro;
 
 public class testSQLConnection : MonoBehaviour
 {
+    public TextMeshProUGUI SQLText;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -24,6 +27,7 @@ public class testSQLConnection : MonoBehaviour
             while (rdr.Read())
             {
                 print(rdr[0] + " -- " + rdr[1]);
+                SQLText.text += rdr[0] + ", " + rdr[1];
             }
             rdr.Close();
         }
