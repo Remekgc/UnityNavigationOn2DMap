@@ -5,44 +5,58 @@ using MySql.Data.MySqlClient;
 using MySql.Data;
 using System;
 using TMPro;
+using System.Threading;
 
 public class testSQLConnection : MonoBehaviour
 {
     public TextMeshProUGUI SQLText;
+    public string data;
+    private bool threadDone = false;
 
-    // Start is called before the first frame update
     void Start()
+    {
+        var testThread = new Thread(getData);
+        data = "Connecting to SQL";
+        SQLText.text += data;
+        testThread.Start();
+    }
+    public void getData()
     {
         string connStr = "server=unitynavigation.servebeer.com;user=Navigator;database=UnityNavigation;port=32261;password=compass123";
         MySqlConnection conn = new MySqlConnection(connStr);
         try
         {
-            print("Connecting to MySQL...");
+            //print("Connecting to MySQL...");
             conn.Open();
 
             string sql = "SELECT * FROM Test";
             MySqlCommand cmd = new MySqlCommand(sql, conn);
             MySqlDataReader rdr = cmd.ExecuteReader();
 
+            data = "";
             while (rdr.Read())
             {
-                print(rdr[0] + " -- " + rdr[1]);
-                SQLText.text += rdr[0] + ", " + rdr[1];
+                //print(rdr[0] + " -- " + rdr[1]);
+                data += rdr[0] + " " + rdr[1] + "\n";
             }
             rdr.Close();
         }
-        catch (Exception ex)
+        catch
         {
-            print(ex.ToString());
+            data = "Failed to connect";
         }
 
         conn.Close();
-        print("Done.");
+        //print("Done.");
+        threadDone = !threadDone;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
+        if (threadDone)
+        {
+            SQLText.text = data;
+            threadDone = !threadDone;
+        }
     }
 }
