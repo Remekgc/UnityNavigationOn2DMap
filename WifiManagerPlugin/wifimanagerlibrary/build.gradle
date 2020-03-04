@@ -21,6 +21,10 @@ android {
         }
     }
 
+    afterEvaluate {
+        assembleDebug.finalizedBy(exportJar)
+    }
+
 }
 
 dependencies {
@@ -32,3 +36,13 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }
 
+task exportJar(type: Copy) {
+    from('build\\intermediates\\aar_main_jar\\debug\\classes.jar')
+    include('classes.jar')
+    into('..\\..\\NavigationOn2DMap\\Assets\\Plugins\\Android')
+    rename('classes.jar', 'WifiManagerPlugin.jar')
+}
+task deleteOldJar(type: Delete) {
+    delete '..\\..\\NavigationOn2DMap\\Assets\\Plugins\\Android\\WifiManagerPlugin.jar'
+}
+exportJar.dependsOn(deleteOldJar)
