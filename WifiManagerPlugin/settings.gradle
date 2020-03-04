@@ -1,0 +1,3 @@
+rootProject.name='WifiManagerPlugin'
+include ':app'
+include ':wifimanagerlibrary'
