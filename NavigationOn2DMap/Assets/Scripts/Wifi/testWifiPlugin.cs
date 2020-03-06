@@ -13,7 +13,7 @@ public class testWifiPlugin : MonoBehaviour
     {
         javaClass = new AndroidJavaObject("com.example.wifimanagerlibrary.AndroidWifiManager");
         javaClass.Call("setWifiScanReceiver");
-        InvokeRepeating("getWifiList", 1, 10);
+        InvokeRepeating("CallStartWifiScan", 1, 31);
         //javaClass.Call("LogSentFromUnity", "Test Unity -> Android communication");
         //wifiManagerText.text = javaClass.Call<string>("SendDataToUnity", "Hello Android, I'm Unity\n");
         // Calling java function that calls Unity function - for example, without any reason.
@@ -21,17 +21,22 @@ public class testWifiPlugin : MonoBehaviour
         //javaClass.Call("callUnityFunctionWithParameter", "Hello there, I'm General Kenobi\n");
     }
 
-    public void getWifiList()
+    public void CallStartWifiScan()
     {
-        wifiManagerText.text = javaClass.Call<string>("getWifiScan");
+        javaClass.Call("startWifiScan");
     }
 
-    public void testUnityFunctionFromAndroid()
+    public void SetWifiManagerText(string wifiList)
+    {
+        wifiManagerText.text = wifiList;
+    }
+
+    public void TestUnityFunctionFromAndroid()
     {
         wifiManagerText.color = Color.black;
     }
 
-    public void testUnityFunctionFromAndroid2(string msg)
+    public void TestUnityFunctionFromAndroid2(string msg)
     {
         wifiManagerText.text += msg;
     }

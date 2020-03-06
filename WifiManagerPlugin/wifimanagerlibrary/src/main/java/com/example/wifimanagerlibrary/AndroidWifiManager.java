@@ -30,6 +30,7 @@ public class AndroidWifiManager {
                 for (ScanResult result:results) {
                     wifiScan += "{SSID : " + result.SSID + "} - {RSSI : " + result.level + "}\n";
                 }
+                UnityPlayer.UnitySendMessage("WifiManagerPlugin", "SetWifiManagerText", wifiScan);
             } else {
                 // scan failure handling
                 List<ScanResult> results = wifiManager.getScanResults();
@@ -39,6 +40,7 @@ public class AndroidWifiManager {
                 for (ScanResult result:results) {
                     wifiScan += "{SSID : " + result.SSID + "} - {RSSI : " + result.level + "}\n";
                 }
+                UnityPlayer.UnitySendMessage("WifiManagerPlugin", "SetWifiManagerText", wifiScan);
             }
         }
     };
@@ -49,10 +51,8 @@ public class AndroidWifiManager {
         Log.d(TAG, "Wifi manager started");
     }
 
-    public String getWifiScan(){
-        Log.d(TAG, "Trying to Scan");
+    public void startWifiScan(){
         wifiManager.startScan();
-        return wifiScan;
     }
 
     public void LogSentFromUnity(String unityLog){
