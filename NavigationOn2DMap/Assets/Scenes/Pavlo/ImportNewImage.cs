@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class ImportNewImage : MonoBehaviour
 {
-    string imageLink = "https://www.w3schools.com/w3css/img_snowtops.jpg";
+    /*string imageLink = "https://www.w3schools.com/w3css/img_snowtops.jpg";
     float progress;
     [SerializeField] Image testImage;
     Coroutine importImage;
@@ -32,5 +32,5 @@ public class ImportNewImage : MonoBehaviour
         testImage.sprite = Sprite.Create(texture, new Rect(x: 0, y: 0, texture.width, texture.height), new Vector2(x: 0, y: 0));
         testImage.SetNativeSize();
         importImage = null;
-    }
+    }*/
 }

@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-public class testWifiPlugin : MonoBehaviour
+public class testBeaconScanner : MonoBehaviour
 {
-    public TextMeshProUGUI wifiManagerText;
-    public TextMeshProUGUI bluetoothManagerText;
+    public TextMeshProUGUI wifiScanText;
+    public TextMeshProUGUI bluetoothScanText;
 
     private AndroidJavaObject javaClass;
 
     void Start()
     {
-        javaClass = new AndroidJavaObject("com.example.wifimanagerlibrary.AndroidWifiManager");
+        javaClass = new AndroidJavaObject("com.example.beaconScannerLibrary.AndroidBeaconScanner");
         javaClass.Call("setWifiScanReceiver");
         InvokeRepeating("CallWifiScan", 1, 31);
-        InvokeRepeating("CallBluetoothScan", 1, 10);
+        InvokeRepeating("CallBluetoothScan", 1, 12);
         //javaClass.Call("LogSentFromUnity", "Test Unity -> Android communication");
         //wifiManagerText.text = javaClass.Call<string>("SendDataToUnity", "Hello Android, I'm Unity\n");
         // Calling java function that calls Unity function - for example, without any reason.
@@ -35,21 +35,23 @@ public class testWifiPlugin : MonoBehaviour
 
     public void SetWifiManagerText(string wifiList)
     {
-        wifiManagerText.text = wifiList;
+        wifiScanText.text = wifiList;
     }
 
     public void SetBlueToothManagerText(string bluetoothList)
     {
-        bluetoothManagerText.text += bluetoothList;
+        bluetoothScanText.text = "";
+        bluetoothScanText.text += bluetoothList + "\n";
     }
 
     public void TestUnityFunctionFromAndroid()
     {
-        wifiManagerText.color = Color.black;
+        wifiScanText.color = Color.black;
     }
 
     public void TestUnityFunctionFromAndroid2(string msg)
     {
-        wifiManagerText.text += msg;
+        wifiScanText.text += msg;
     }
 }
+
