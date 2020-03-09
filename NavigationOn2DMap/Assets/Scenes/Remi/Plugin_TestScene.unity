@@ -568,9 +568,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 599398582}
-  - component: {fileID: 599398583}
+  - component: {fileID: 599398584}
   m_Layer: 0
-  m_Name: BeaconScannerPlugin
+  m_Name: WifiBeaconScanner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -590,7 +590,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &599398583
+--- !u!114 &599398584
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -599,11 +599,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 599398581}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 65e84c47bb890054a988f773d5440474, type: 3}
+  m_Script: {fileID: 11500000, guid: 9ffebf60ce7c68c4fbe5fe3ada984410, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scanFrequency: 31
+  filter: none
   wifiScanText: {fileID: 745336750}
-  bluetoothScanText: {fileID: 786270579}
 --- !u!1 &745336748
 GameObject:
   m_ObjectHideFlags: 0
@@ -1678,6 +1679,36 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1239053638}
   m_CullTransparentMesh: 0
+--- !u!1 &1494485745
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1494485746}
+  m_Layer: 0
+  m_Name: BluetoothBeaconScanner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1494485746
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1494485745}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.42428863, y: 0.18013394, z: -11.005394}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1790698287
 GameObject:
   m_ObjectHideFlags: 0

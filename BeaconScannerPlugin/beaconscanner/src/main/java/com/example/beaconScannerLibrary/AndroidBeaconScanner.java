@@ -18,7 +18,7 @@ public class AndroidBeaconScanner {
     private Context context = UnityPlayer.currentActivity.getApplicationContext(); // Getting app context that is assigned in Unity class.
     private WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE); // Getting Wifi service.
     private String TAG = "UnityBeaconPlugin"; // Tag for Logcat
-    private String UnityBeaconScannerObject = "BeaconScannerPlugin"; // Game object that we call in Unity - it searches it for the class with functions that are called from here.
+    private String UnityWifiBeaconScannerObject = "WifiBeaconScanner", UnityBluetoothBeaconScannerObject = "BluetoothBeaconScanner" ; // Game object that we call in Unity - it searches it for the class with functions that are called from here.
     private IntentFilter intentFilter = new IntentFilter(); // new Intent Filter
     private BluetoothManager bluetoothManager = (BluetoothManager) context.getApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE); // Getting Bluetooth service.
 
@@ -26,22 +26,25 @@ public class AndroidBeaconScanner {
         @Override
         public void onReceive(Context c, Intent intent) {
             boolean success = intent.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, false);
+            List<ScanResult> results = wifiManager.getScanResults();
+            String wifiScanResult = "";
             if (success) {
-                List<ScanResult> results = wifiManager.getScanResults();
                 Log.d(TAG, "Wifi Scan Successful");
-                String wifiScanResult = "";
                 for (ScanResult result:results) {
-                    wifiScanResult += "{SSID : " + result.SSID + "} - {RSSI : " + result.level + "}\n";
+                    //wifiScanResult += "{SSID : " + result.SSID + "} - {RSSI : " + result.level + "}\n";
+                    wifiScanResult = result.SSID;
+                    UnityPlayer.UnitySendMessage(UnityWifiBeaconScannerObject, "UpdateBeaconList", wifiScanResult);
+                    Log.d(TAG, "WIFI Device name: " + result.SSID + ", RSSI: " + result.level);
                 }
-                UnityPlayer.UnitySendMessage(UnityBeaconScannerObject, "SetWifiManagerText", wifiScanResult);
-            } else {
-                List<ScanResult> results = wifiManager.getScanResults();
+            }
+            else {
                 Log.d(TAG, "Wifi Scan failed");
-                String wifiScan = "";
-                for (ScanResult result:results) {
-                    wifiScan += "{SSID : " + result.SSID + "} - {RSSI : " + result.level + "}\n";
+                for (ScanResult result : results) {
+                    //wifiScanResult += "{SSID : " + result.SSID + "} - {RSSI : " + result.level + "}\n";
+                    wifiScanResult = result.SSID;
+                    UnityPlayer.UnitySendMessage(UnityWifiBeaconScannerObject, "UpdateBeaconList", wifiScanResult);
+                    Log.d(TAG, "WIFI Device name: " + result.SSID + ", RSSI: " + result.level);
                 }
-                UnityPlayer.UnitySendMessage(UnityBeaconScannerObject, "SetWifiManagerText", wifiScan);
             }
         }
     };
@@ -50,10 +53,14 @@ public class AndroidBeaconScanner {
         // Setting up WiFi
         intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
         context.registerReceiver(wifiScanReceiver, intentFilter);
+        Log.d(TAG, "Wifi Scanner started");
+    }
+
+    public void setBluetoothScanReceiver(){
         // Setting up Bluetooth
         intentFilter.addAction(BluetoothDevice.ACTION_FOUND);
         context.registerReceiver(bluetoothScanReceiver, intentFilter);
-        Log.d(TAG, "Scanner started started");
+        Log.d(TAG, "Bluetooth Scanner started");
     }
 
     public void startWifiScan(){
@@ -74,7 +81,7 @@ public class AndroidBeaconScanner {
                 int rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI,Short.MIN_VALUE);
                 assert device != null;
                 Log.d(TAG, "Bluetooth Device name: " + device.getName() + ", RSSI: " + rssi);
-                UnityPlayer.UnitySendMessage(UnityBeaconScannerObject, "SetBlueToothManagerText", "{Name : " + device.getName() + "} - {RSSI : " + rssi + "}");
+                UnityPlayer.UnitySendMessage(UnityBluetoothBeaconScannerObject, "UpdateBeaconList", device.getName());
             }
         }
     };
@@ -89,11 +96,11 @@ public class AndroidBeaconScanner {
 
     public void callUnityFunctionWithoutParameter(){
         // make call to Unity function
-        UnityPlayer.UnitySendMessage(UnityBeaconScannerObject, "testUnityFunctionFromAndroid", "");
+        UnityPlayer.UnitySendMessage(UnityBluetoothBeaconScannerObject, "testUnityFunctionFromAndroid", "");
     }
 
     public void callUnityFunctionWithParameter(String unityLog){
         // make call to Unity function
-        UnityPlayer.UnitySendMessage(UnityBeaconScannerObject, "testUnityFunctionFromAndroid2", unityLog);
+        UnityPlayer.UnitySendMessage(UnityBluetoothBeaconScannerObject, "testUnityFunctionFromAndroid2", unityLog);
     }
 }
