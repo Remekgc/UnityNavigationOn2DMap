@@ -32,7 +32,7 @@ public class AndroidBeaconScanner {
                 Log.d(TAG, "Wifi Scan Successful");
                 for (ScanResult result:results) {
                     //wifiScanResult += "{SSID : " + result.SSID + "} - {RSSI : " + result.level + "}\n";
-                    wifiScanResult = result.SSID + " - " + result.level;
+                    wifiScanResult = result.level + "~" + result.SSID;
                     UnityPlayer.UnitySendMessage(UnityWifiBeaconScannerObject, "UpdateBeaconList", wifiScanResult);
                     Log.d(TAG, "WIFI Device name: " + result.SSID + ", RSSI: " + result.level);
                 }
@@ -41,7 +41,7 @@ public class AndroidBeaconScanner {
                 Log.d(TAG, "Wifi Scan failed");
                 for (ScanResult result : results) {
                     //wifiScanResult += "{SSID : " + result.SSID + "} - {RSSI : " + result.level + "}\n";
-                    wifiScanResult = result.SSID + " - " + result.level;
+                    wifiScanResult = result.level + "~" + result.SSID;
                     UnityPlayer.UnitySendMessage(UnityWifiBeaconScannerObject, "UpdateBeaconList", wifiScanResult);
                     Log.d(TAG, "WIFI Device name: " + result.SSID + ", RSSI: " + result.level);
                 }
@@ -64,13 +64,13 @@ public class AndroidBeaconScanner {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                // Discovery has found a device. Get the BluetoothDevice
-                // object and its info from the Intent.
+                // Discovery has found a device. Get the BluetoothDevice object and its info from the Intent.
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 int rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI,Short.MIN_VALUE);
                 assert device != null;
+                String bluetoothScanResult = rssi + "~" + device.getName();
                 Log.d(TAG, "Bluetooth Device name: " + device.getName() + ", RSSI: " + rssi);
-                UnityPlayer.UnitySendMessage(UnityBluetoothBeaconScannerObject, "UpdateBeaconList", "{Name : " + device.getName() + "} - {RSSI : " + rssi + "}");
+                UnityPlayer.UnitySendMessage(UnityBluetoothBeaconScannerObject, "UpdateBeaconList", bluetoothScanResult);
             }
         }
     };

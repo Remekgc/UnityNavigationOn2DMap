@@ -14,8 +14,7 @@ public interface IScanner
     bool BeaconListRecentlyUpdated { get; set; }
     // Functioncs
     void StartScan();
-    void StartScan(string filter);
     void StopScan();
-    void UpdateBeaconList(string ssid, int rssi);
-    
+    void UpdateBeaconList(string scanResult);
+
 }

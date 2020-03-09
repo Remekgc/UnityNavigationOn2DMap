@@ -12,23 +12,32 @@ public abstract class Scanner : MonoBehaviour, IScanner
     public List<Beacon> Beacons { get; set; }
     public bool BeaconListRecentlyUpdated { get; set; }
 
-    /*public Scanner(int scanFrequency = 31, string filter = "none")
-    {
-        ScanFrequency = scanFrequency;
-        Filter = filter;
-        Beacons = new List<Beacon>();
-        BeaconListRecentlyUpdated = false;
-        JavaObject = new AndroidJavaObject("com.example.beaconScannerLibrary.AndroidBeaconScanner");
-    }*/
-
     public abstract void StartScan();
-    public abstract void StartScan(string filter);
     public abstract void StopScan();
 
     //Does not have to be overriden but if we decide to add some functionality based on connection type then it will have to be.
-    public virtual void UpdateBeaconList(string ssid, int rssi)
+    public virtual void UpdateBeaconList(string scanResult)
     {
-        if (Beacons.Count > 0)
+        // Filter the data
+        int rssi = 0;
+        string ssid, temp = "";
+
+        for (int i = 0; i < scanResult.Length; i++)
+        {
+            if (scanResult[i] != '~')
+            {
+                temp += scanResult[i];
+            }
+            else
+            {
+                rssi = Mathf.Abs(int.Parse(temp));
+                temp = "";
+            }
+        }
+        ssid = temp;
+
+        // Filter the list
+        if (Beacons.Count > 0 && ssid.Contains(Filter))
         {
             for (int i = 0; i < Beacons.Count; i++)
             {
@@ -47,10 +56,10 @@ public abstract class Scanner : MonoBehaviour, IScanner
                 }
             }
         }
-        else
+        else if(ssid.Contains(Filter))
         {
             Beacons.Add(new Beacon(ssid, rssi));
         }
-
     }
+
 }

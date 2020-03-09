@@ -6,18 +6,8 @@ using TMPro;
 
 public sealed class WifiScanner : Scanner
 {
-    /*public WifiScanner(int scanFrequency = 31, string filter = "none")
-    {
-        ScanFrequency = scanFrequency;
-        Filter = filter;
-        Beacons = new List<Beacon>();
-        BeaconListRecentlyUpdated = false;
-        JavaObject = new AndroidJavaObject("com.example.beaconScannerLibrary.AndroidBeaconScanner");
-        JavaObject.Call("setWifiScanReceiver");
-    }*/
-
     public int scanFrequency = 31;
-    public string filter = "none";
+    public string filter;
     public TextMeshProUGUI wifiScanText;
     public bool updateUI = true;
 
@@ -38,56 +28,20 @@ public sealed class WifiScanner : Scanner
         JavaObject.Call("startWifiScan");
     }
 
-    public override void StartScan(string filter)
-    {
-        JavaObject.Call("startWifiScan", filter);
-    }
-
-    public override void StopScan()
-    {
-        if (scanThread != null && scanThread.IsAlive)
-        {
-            scanThread.Abort();
-        }
-    }
-
-    public void UpdateBeaconList(string ssid)
-    {
-        int rssi = 0;
-        if (Beacons.Count > 0)
-        {
-            for (int i = 0; i < Beacons.Count; i++)
-            {
-                if (Beacons[i].SSID == ssid)
-                {
-                    if (Beacons[i].RSSI != rssi)
-                    {
-                        Beacons[i].RSSI = rssi;
-                        BeaconListRecentlyUpdated = true;
-                    }
-                    break;
-                }
-                else if (i == Beacons.Count - 1)
-                {
-                    Beacons.Add(new Beacon(ssid, rssi));
-                }
-            }
-        }
-        else
-        {
-            Beacons.Add(new Beacon(ssid, rssi));
-        }
-    }
-
-    public void updateUIText()
+    public void UpdateUIText()
     {
         wifiScanText.text = "";
         if (updateUI)
         {
             foreach (var item in Beacons)
             {
-                wifiScanText.text += item.SSID + " - " + item.RSSI + "\n";
+                wifiScanText.text += item.SSID + " : " + item.RSSI + "\n";
             }
         }
+    }
+
+    public override void StopScan()
+    {
+        throw new System.NotImplementedException();
     }
 }
