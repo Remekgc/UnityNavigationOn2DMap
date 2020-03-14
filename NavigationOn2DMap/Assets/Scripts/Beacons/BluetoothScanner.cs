@@ -5,42 +5,43 @@ using UnityEngine;
 
 public sealed class BluetoothScanner : Scanner
 {
-    public int scanFrequency = 12;
-    public string filter;
     public TextMeshProUGUI bluetoothScanText;
     public bool updateUI = true;
 
     void Start()
     {
-        ScanFrequency = scanFrequency;
-        Filter = filter;
         Beacons = new List<Beacon>();
-        BeaconListRecentlyUpdated = false;
         JavaObject = new AndroidJavaObject("com.example.beaconScannerLibrary.AndroidBeaconScanner");
         JavaObject.Call("setBluetoothScanReceiver");
-        InvokeRepeating("updateUIText", 5, 1);
-        InvokeRepeating("StartScan", 1, ScanFrequency);
+        InvokeRepeating("UpdateUIText", 5, 1);
+        StartCoroutine(Scan());
     }
 
-    public override void StartScan()
+    public override IEnumerator Scan()
     {
-        JavaObject.Call("startBluetoothScan");
+        while (true)
+        {
+            if (ScanEnabled)
+            {
+                JavaObject.Call("startBluetoothScan");
+                yield return new WaitForSeconds(ScanFrequency);
+            }
+            else
+            {
+                yield return new WaitForSeconds(1f);
+            }
+        }
     }
 
-    public void updateUIText()
+    public void UpdateUIText()
     {
-        bluetoothScanText.text = "";
         if (updateUI)
         {
+            bluetoothScanText.text = "";
             foreach (var item in Beacons)
             {
                 bluetoothScanText.text += item.SSID + " : " + item.RSSI + "\n";
             }
         }
-    }
-
-    public override void StopScan()
-    {
-        throw new System.NotImplementedException();
     }
 }

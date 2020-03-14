@@ -5,15 +5,23 @@ using UnityEngine;
 
 public abstract class Scanner : MonoBehaviour, IScanner
 {
-    public AndroidJavaObject JavaObject { get; set; }
-    public Thread scanThread { get; set; }
-    public string Filter { get; set; }
-    public int ScanFrequency { get; set; }
-    public List<Beacon> Beacons { get; set; }
-    public bool BeaconListRecentlyUpdated { get; set; }
+    public AndroidJavaObject JavaObject;
+    public string Filter;
+    public int ScanFrequency;
+    public List<Beacon> Beacons;
+    public bool ScanEnabled = true;
 
-    public abstract void StartScan();
-    public abstract void StopScan();
+    public void EnableScan()
+    {
+        ScanEnabled = true;
+    }
+
+    public void DisableScan()
+    {
+        ScanEnabled = false;
+    }
+
+    public abstract IEnumerator Scan();
 
     //Does not have to be overriden but if we decide to add some functionality based on connection type then it will have to be.
     public virtual void UpdateBeaconList(string scanResult)
@@ -37,7 +45,7 @@ public abstract class Scanner : MonoBehaviour, IScanner
         ssid = temp;
 
         // Filter the list
-        if (Beacons.Count > 0 && ssid.Contains(Filter))
+        if (Beacons.Count > 0 && (ssid.Contains(Filter) || Filter == ""))
         {
             for (int i = 0; i < Beacons.Count; i++)
             {
@@ -46,7 +54,6 @@ public abstract class Scanner : MonoBehaviour, IScanner
                     if (Beacons[i].RSSI != rssi)
                     {
                         Beacons[i].RSSI = rssi;
-                        BeaconListRecentlyUpdated = true;
                     }
                     break;
                 }
@@ -56,7 +63,7 @@ public abstract class Scanner : MonoBehaviour, IScanner
                 }
             }
         }
-        else if(ssid.Contains(Filter))
+        else if(ssid.Contains(Filter) || Filter == "")
         {
             Beacons.Add(new Beacon(ssid, rssi));
         }

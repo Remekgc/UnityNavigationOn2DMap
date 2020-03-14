@@ -5,16 +5,10 @@ using System.Threading;
 
 public interface IScanner
 {
-    // Parameters
-    AndroidJavaObject JavaObject { get; set; }
-    Thread scanThread { get; set; }
-    string Filter { get; set; }
-    int ScanFrequency { get; set; }
-    List<Beacon> Beacons { get; set; }
-    bool BeaconListRecentlyUpdated { get; set; }
     // Functioncs
-    void StartScan();
-    void StopScan();
+    void EnableScan();
+    void DisableScan();
+    IEnumerator Scan();
     void UpdateBeaconList(string scanResult);
 
 }

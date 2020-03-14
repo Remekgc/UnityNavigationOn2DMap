@@ -43,7 +43,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ffebf60ce7c68c4fbe5fe3ada984410, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scanFrequency: 31
-  filter: U
+  Filter: 
+  ScanFrequency: 31
+  ScanEnabled: 1
   wifiScanText: {fileID: 0}
   updateUI: 1
