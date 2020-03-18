@@ -6,7 +6,8 @@ using UnityEngine.UI;
 
 public class ImportNewImage : MonoBehaviour
 {
-    string imageLink = "https://www.w3schools.com/w3css/img_snowtops.jpg";
+    string imageLink = "https://drive.google.com/file/d/1CJ7QxTPCnQ_ne9n6Kl9TH8ANmuf5lIQt/view?usp=sharing";
+    int imageNum = 0;
     float progress;
     [SerializeField] Image testImage;
     Coroutine importImage;
@@ -16,9 +17,19 @@ public class ImportNewImage : MonoBehaviour
         importImage = StartCoroutine(Import(imageLink));
     }
 
+    private void Update()
+    {
+        print(PlayerPrefs.GetString("Map1"));
+    }
+
     IEnumerator Import(string link)
     {
-        UnityWebRequest imageRequest = UnityWebRequestTexture.GetTexture(link);
+        imageNum++;
+        string imageId = link.Split('/')[5];
+        string readyLink = "https://drive.google.com/uc?id=" + imageId;
+        PlayerPrefs.SetString("Map" + imageNum, readyLink);
+        print(imageId);
+        UnityWebRequest imageRequest = UnityWebRequestTexture.GetTexture(readyLink);
         var operation = imageRequest.SendWebRequest();
 
         while (!imageRequest.isDone)
@@ -26,11 +37,11 @@ public class ImportNewImage : MonoBehaviour
             progress = operation.progress;
             yield return null;
         }
-        progress = 1f;
-        Texture2D texture = DownloadHandlerTexture.GetContent(imageRequest);
-        testImage.gameObject.SetActive(true);
-        testImage.sprite = Sprite.Create(texture, new Rect(x: 0, y: 0, texture.width, texture.height), new Vector2(x: 0, y: 0));
-        testImage.SetNativeSize();
-        importImage = null;
+            progress = 1f;
+            Texture2D texture = DownloadHandlerTexture.GetContent(imageRequest);
+            testImage.gameObject.SetActive(true);
+            testImage.sprite = Sprite.Create(texture, new Rect(x: 0, y: 0, texture.width, texture.height), new Vector2(x: 0, y: 0));
+            testImage.SetNativeSize();
+            importImage = null;
     }
 }
