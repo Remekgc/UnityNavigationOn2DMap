@@ -51,7 +51,7 @@ public class ImportFloorMaps : MonoBehaviour
             tempTexture = listOfMapsImages[index];
             testImage.sprite = Sprite.Create(tempTexture, new Rect(x: 0, y: 0, tempTexture.width, tempTexture.height), new Vector2(x: 0, y: 0));
             var objTransform = testImage.transform as RectTransform;
-            objTransform.sizeDelta = new Vector2(tempTexture.width, tempTexture.height);
+            //objTransform.sizeDelta = new Vector2(tempTexture.width, tempTexture.height);
             testImage.gameObject.SetActive(true);
         }
         else
@@ -59,7 +59,7 @@ public class ImportFloorMaps : MonoBehaviour
             tempTexture = listOfMapsImages[index];
             testImage.sprite = Sprite.Create(tempTexture, new Rect(x: 0, y: 0, tempTexture.width, tempTexture.height), new Vector2(x: 0, y: 0));
             var objTransform = testImage.transform as RectTransform;
-            objTransform.sizeDelta = new Vector2(tempTexture.width, tempTexture.height);
+            //objTransform.sizeDelta = new Vector2(tempTexture.width, tempTexture.height);
         }
         
         
