@@ -28,7 +28,7 @@ public class SimpleSQLUserScriptExample : MonoBehaviour
             }
             else
             {
-                print("Waiting suka!");
+                // print("Query not finished yet");
                 yield return new WaitForSecondsRealtime(2);
             }
         }
