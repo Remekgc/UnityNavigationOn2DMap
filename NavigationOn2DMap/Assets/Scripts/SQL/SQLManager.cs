@@ -14,11 +14,11 @@ public class SQLManager : MonoBehaviour
                             "database=UnityNavigation;" +
                             "port=32261;" +
                             "password=compass123";
-    private bool threadDone = false, QueryTreadStatus = false;
-    private int numberOfValuesForSorting = 0;
+    private Thread selectQueryThread;
 
+    public bool threadDone = false, SelectQueryDone = true;
     public TextMeshProUGUI SQLText;
-    public string data, QueryStatement, QueryResult;
+    public string testData, QueryStatement, SelectQueryResult;
 
     void Start()
     {
@@ -26,37 +26,38 @@ public class SQLManager : MonoBehaviour
         data = "Connecting to SQL";
         SQLText.text += data;
         testThread.Start();*/
-        ExecuteReaderQuery("SELECT Name FROM Building WHERE Name = 'Adrian_Home'", 1);
+        //ExecuteReaderQuery("SELECT Name FROM Building WHERE Name = 'Adrian_Home'");
     }
 
-    public void ExecuteReaderQuery(string sqlQuery, int numberOfValuesSelected)
+    public void ExecuteReaderQuery(string sqlQuery)
     {
-        numberOfValuesForSorting = numberOfValuesSelected;
-        QueryStatement = sqlQuery;
-        var queryThread = new Thread(ReaderQuery);
-        if (queryThread.IsAlive)
+        if (selectQueryThread != null && selectQueryThread.IsAlive) // Checking if thread is defined and alive
         {
             print("Query already executing, please wait for the result before running again.");
         }
-        else
+        else // Otherwise creating a new thread and running it
         {
-            queryThread.Start();
+            SelectQueryDone = false;
+            QueryStatement = sqlQuery;
+            selectQueryThread = new Thread(ReaderQuery);
+            selectQueryThread.Start();
         }
     }
 
     public void ReaderQuery()
     {
-        MySqlConnection sqlConnection = new MySqlConnection(ConnStr);
+        MySqlConnection sqlConnection = new MySqlConnection(ConnStr); // Creating sql connection with defined connection data
         try
         {
             sqlConnection.Open();
-            MySqlCommand cmd = new MySqlCommand(QueryStatement, sqlConnection);
+            MySqlCommand cmd = new MySqlCommand(QueryStatement, sqlConnection); // Creating new sql qurey command
             MySqlDataReader dataReader = cmd.ExecuteReader();
 
-            QueryResult = "";
+            SelectQueryResult = "";
             while (dataReader.Read())
             {
                 print(dataReader[0]);
+                SelectQueryResult += dataReader[0];
             }
             dataReader.Close();
         }
@@ -64,8 +65,10 @@ public class SQLManager : MonoBehaviour
         {
             print("Reader Querry error");
         }
+        SelectQueryDone = true;
     }
 
+    // Test Fuction - not important
     private void GetTestData()
     {
         MySqlConnection conn = new MySqlConnection(ConnStr);
@@ -78,17 +81,17 @@ public class SQLManager : MonoBehaviour
             MySqlCommand cmd = new MySqlCommand(sql, conn);
             MySqlDataReader rdr = cmd.ExecuteReader();
 
-            data = "";
+            testData = "";
             while (rdr.Read())
             {
                 //print(rdr[0] + " -- " + rdr[1]);
-                data += rdr[0] + " " + rdr[1] + "\n";
+                testData += rdr[0] + " " + rdr[1] + "\n";
             }
             rdr.Close();
         }
         catch
         {
-            data = "Failed to connect";
+            testData = "Failed to connect";
         }
 
         conn.Close();
@@ -100,7 +103,7 @@ public class SQLManager : MonoBehaviour
     {
         if (threadDone)
         {
-            SQLText.text = data;
+            SQLText.text = testData;
             threadDone = !threadDone;
         }
     }
