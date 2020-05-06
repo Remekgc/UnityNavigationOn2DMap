@@ -14,32 +14,41 @@ public class GPS : MonoBehaviour
     public string buildingLatitude;
     public string buildingLongitude;
     public List<Point> points;
-    //public Text text2;
-    // Start is called before the first frame update
+    public SimpleSQLUserScriptExample sqlData;
+    private Point coordinates;
+
     void Start()
     {
         latitude = 51.27639;
         longitude = 22.551178;
-        Point coordinates = new Point(latitude, longitude);
-        buildingLatitude = "51.276419;51.276314;51.276414;51.276303";
-        buildingLongitude = "22.551123;22.551122;22.552285;22.552287";
-        var latitudeList = buildingLatitude.Split(';').Select(double.Parse).ToList();
-        List<double> longitudeList = new List<double>(Array.ConvertAll(buildingLongitude.Split(';'), double.Parse));
-        Debug.Log(latitudeList[0]);
-        Debug.Log(longitudeList[0]);
-        List<Point> points = new List<Point>();
-        for(int i = 0; i<latitudeList.Count; i++)
-        {
-            points.Add(new Point(latitudeList[i], longitudeList[i]));
-        }
-        Debug.Log(points.Count);
         Instance = this;
-        Debug.Log(IsInsideBuilding(points, coordinates));
         DontDestroyOnLoad(gameObject);
         StartCoroutine(StartLocationService());
 
     }
-
+    private void Update()
+    {
+        if (buildingLatitude == ""&& buildingLongitude != sqlData.data)
+            buildingLatitude = sqlData.data;
+        else if (buildingLongitude == "" && buildingLatitude != sqlData.data)
+            buildingLongitude = sqlData.data;
+        if(buildingLongitude != buildingLatitude && buildingLongitude != "" && buildingLatitude != "")
+        {
+            coordinates = new Point(latitude, longitude);
+            var latitudeList = buildingLatitude.Split(';').Select(double.Parse).ToList();
+            List<double> longitudeList = new List<double>(Array.ConvertAll(buildingLongitude.Split(';'), double.Parse));
+            Debug.Log(latitudeList[0]);
+            Debug.Log(longitudeList[0]);
+            List<Point> points = new List<Point>();
+            for (int i = 0; i < latitudeList.Count; i++)
+            {
+                points.Add(new Point(latitudeList[i], longitudeList[i]));
+            }
+            Debug.Log(points.Count);
+            Debug.Log(IsInsideBuilding(points, coordinates));
+        }
+    }
+    //tego nie ruszac bo zabije
     private bool IsInsideBuilding(List<Point> polygon, Point coordinates)
     {
         bool result = false;
@@ -58,6 +67,7 @@ public class GPS : MonoBehaviour
         }
         return result;
     }
+    //tego tez >.>
     private IEnumerator StartLocationService()
     {
         if(!Input.location.isEnabledByUser)

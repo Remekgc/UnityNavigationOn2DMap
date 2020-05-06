@@ -8,7 +8,7 @@ public class SimpleSQLUserScriptExample : MonoBehaviour
     public SQLManager sqlManager;
     public string data;
     public TextMeshProUGUI SQLText;
-
+    public string sqlQuery;
     public void GetDatabaseData()
     {
         StartCoroutine(IGetDatabaseData());
@@ -17,7 +17,7 @@ public class SimpleSQLUserScriptExample : MonoBehaviour
     public IEnumerator IGetDatabaseData()
     {
         Debug.Log("IGetDatabaseData started");  
-        sqlManager.ExecuteReaderQuery("SELECT Name FROM Building WHERE Name = 'Adrian_Home'");
+        sqlManager.ExecuteReaderQuery(sqlQuery);
         while (true)
         {
             if (sqlManager.SelectQueryDone)
@@ -28,7 +28,7 @@ public class SimpleSQLUserScriptExample : MonoBehaviour
             }
             else
             {
-                // print("Query not finished yet");
+                print("Query not finished yet");
                 yield return new WaitForSecondsRealtime(2);
             }
         }
