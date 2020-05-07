@@ -635,6 +635,7 @@ MonoBehaviour:
   buildingLatitude: 
   buildingLongitude: 
   sqlData: {fileID: 1344859293}
+  sqlManager: {fileID: 1344859291}
 --- !u!1 &513255165
 GameObject:
   m_ObjectHideFlags: 0
@@ -1358,7 +1359,6 @@ MonoBehaviour:
   SQLText: {fileID: 0}
   testData: 
   QueryStatement: 
-  SelectQueryResult: 
 --- !u!4 &1344859292
 Transform:
   m_ObjectHideFlags: 0

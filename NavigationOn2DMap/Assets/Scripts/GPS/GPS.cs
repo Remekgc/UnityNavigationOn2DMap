@@ -15,15 +15,17 @@ public class GPS : MonoBehaviour
     public string buildingLongitude;
     public List<Point> points;
     public SimpleSQLUserScriptExample sqlData;
+    [SerializeField] protected SQLManager sqlManager;
     private Point coordinates;
 
     void Start()
     {
-        latitude = 51.27639;
+        /*latitude = 51.27639;
         longitude = 22.551178;
         Instance = this;
         DontDestroyOnLoad(gameObject);
-        StartCoroutine(StartLocationService());
+        StartCoroutine(StartLocationService());*/
+        GetDatabaseData();
 
     }
     private void Update()
@@ -48,6 +50,42 @@ public class GPS : MonoBehaviour
             Debug.Log(IsInsideBuilding(points, coordinates));
         }
     }
+
+    public void GetDatabaseData()
+    {
+        StartCoroutine(IGetDatabaseData());
+    }
+
+    public IEnumerator IGetDatabaseData()
+    {
+        Debug.Log("IGetDatabaseData started");
+        // tu se wstaw query jakie chcesz
+        //sqlManager.ExecuteReaderQuery("SELECT Name FROM Building WHERE Name = 'Adrian_Home'");
+        //sqlManager.ExecuteReaderQuery("SELECT * FROM Building");
+        sqlManager.ExecuteReaderQuery("SELECT * FROM Test");
+        while (true)
+        {
+            if (sqlManager.SelectQueryDone)
+            {
+                foreach (var x in sqlManager.selectQueryResult)
+                {
+                    foreach (var y in x)
+                    {
+                        print(y);
+                    }
+                }
+                sqlManager.SelectQueryDone = false;
+                yield break;
+            }
+            else
+            {
+                print("Waiting for the query to complete!");
+                yield return new WaitForSecondsRealtime(2);
+            }
+        }
+
+    }
+
     //tego nie ruszac bo zabije
     private bool IsInsideBuilding(List<Point> polygon, Point coordinates)
     {

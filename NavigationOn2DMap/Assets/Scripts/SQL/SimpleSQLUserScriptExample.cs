@@ -22,7 +22,8 @@ public class SimpleSQLUserScriptExample : MonoBehaviour
         {
             if (sqlManager.SelectQueryDone)
             {
-                data = sqlManager.SelectQueryResult;
+                //data = sqlManager.selectQueryResult;
+                data = sqlManager.selectQueryResult[0][1].ToString();
                 SQLText.text = data;
                 yield break;
             }

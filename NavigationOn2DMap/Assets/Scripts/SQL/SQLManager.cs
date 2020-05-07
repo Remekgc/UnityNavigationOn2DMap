@@ -17,8 +17,9 @@ public class SQLManager : MonoBehaviour
     private Thread selectQueryThread;
 
     public bool threadDone = false, SelectQueryDone = true;
-    public TextMeshProUGUI SQLText;
-    public string testData, QueryStatement, SelectQueryResult;
+    [SerializeField] protected TextMeshProUGUI SQLText;
+    public string testData, QueryStatement;
+    public List<List<string>> selectQueryResult = new List<List<string>>();
 
     void Start()
     {
@@ -53,17 +54,23 @@ public class SQLManager : MonoBehaviour
             MySqlCommand cmd = new MySqlCommand(QueryStatement, sqlConnection); // Creating new sql qurey command
             MySqlDataReader dataReader = cmd.ExecuteReader();
 
-            SelectQueryResult = "";
+            selectQueryResult.Clear();
+            int listID = 0;
+
             while (dataReader.Read())
             {
-                print(dataReader[0]);
-                SelectQueryResult += dataReader[0];
+                selectQueryResult.Add(new List<string>());
+                for (int i = 0; i < dataReader.FieldCount; i++)
+                {
+                    selectQueryResult[listID].Add(dataReader[i].ToString());
+                }
+                listID++;
             }
             dataReader.Close();
         }
-        catch
+        catch (Exception ex)
         {
-            print("Reader Querry error");
+            print("Reader Querry error: " + ex);
         }
         SelectQueryDone = true;
     }
