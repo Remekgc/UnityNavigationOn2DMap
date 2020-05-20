@@ -25,7 +25,7 @@ public class GPS : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
         StartCoroutine(StartLocationService());*/
-        GetDatabaseData();
+        //GetDatabaseData();
 
     }
     private void Update()
