@@ -216,6 +216,16 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 587625182601150916, guid: 847e27be40172274ca78dbf2e62aa666,
         type: 3}
+      propertyPath: map
+      value: 
+      objectReference: {fileID: 879697693}
+    - target: {fileID: 587625182601150916, guid: 847e27be40172274ca78dbf2e62aa666,
+        type: 3}
+      propertyPath: debugtext
+      value: 
+      objectReference: {fileID: 1271995460}
+    - target: {fileID: 587625182601150916, guid: 847e27be40172274ca78dbf2e62aa666,
+        type: 3}
       propertyPath: camPos
       value: 
       objectReference: {fileID: 1249141963}
@@ -224,25 +234,15 @@ PrefabInstance:
       propertyPath: camSize
       value: 
       objectReference: {fileID: 1575524972}
-    - target: {fileID: 587625182601150916, guid: 847e27be40172274ca78dbf2e62aa666,
-        type: 3}
-      propertyPath: debugtext
-      value: 
-      objectReference: {fileID: 1271995460}
-    - target: {fileID: 587625182601150916, guid: 847e27be40172274ca78dbf2e62aa666,
-        type: 3}
-      propertyPath: map
-      value: 
-      objectReference: {fileID: 879697693}
     - target: {fileID: 587625182601150917, guid: 847e27be40172274ca78dbf2e62aa666,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 3.5
       objectReference: {fileID: 0}
     - target: {fileID: 587625182601150917, guid: 847e27be40172274ca78dbf2e62aa666,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 587625182601150917, guid: 847e27be40172274ca78dbf2e62aa666,
         type: 3}
@@ -858,15 +858,9 @@ PrefabInstance:
       objectReference: {fileID: 6922967867195074639}
     - target: {fileID: 7707834604354846160, guid: 9cfbee4e57b1cfa4ca8eb8b069e5b791,
         type: 3}
-      propertyPath: testImage
+      propertyPath: floorMapPreview
       value: 
       objectReference: {fileID: 6923642122180517745}
-    - target: {fileID: 7707834604354846160, guid: 9cfbee4e57b1cfa4ca8eb8b069e5b791,
-        type: 3}
-      propertyPath: button
-      value: 
-      objectReference: {fileID: 1739340630531566947, guid: 5da171b9d5445ce46b3abf3f503c720d,
-        type: 3}
     - target: {fileID: 7707834604354846160, guid: 9cfbee4e57b1cfa4ca8eb8b069e5b791,
         type: 3}
       propertyPath: menuCanvas
@@ -887,11 +881,6 @@ PrefabInstance:
       propertyPath: map
       value: 
       objectReference: {fileID: 879697693}
-    - target: {fileID: 7707834604354846160, guid: 9cfbee4e57b1cfa4ca8eb8b069e5b791,
-        type: 3}
-      propertyPath: floorMapPreview
-      value: 
-      objectReference: {fileID: 6923642122180517745}
     - target: {fileID: 7707834604354846161, guid: 9cfbee4e57b1cfa4ca8eb8b069e5b791,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1307,7 +1296,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &6923642122180517745
 MonoBehaviour:
   m_ObjectHideFlags: 0

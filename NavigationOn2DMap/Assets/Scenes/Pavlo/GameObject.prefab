@@ -44,7 +44,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   listOfMapsLinks: []
-  listOfMapsImages: []
-  button: {fileID: 114329984364570850, guid: 5da171b9d5445ce46b3abf3f503c720d, type: 3}
+  listOfMapsPaths: []
+  button: {fileID: 1739340630531566947, guid: 5da171b9d5445ce46b3abf3f503c720d, type: 3}
   contentList: {fileID: 0}
-  testImage: {fileID: 0}
+  floorMapPreview: {fileID: 0}
+  menuCanvas: {fileID: 0}
+  mapCanvas: {fileID: 0}
+  beaconController: {fileID: 0}
+  map: {fileID: 0}

@@ -26,7 +26,7 @@ public class ImportFloorMaps : MonoBehaviour
     float progress;
     Texture2D tempTexture;
     [SerializeField] Image floorMapPreview;
-    Coroutine importImage;
+    Coroutine importImages;
     Coroutine showImageCoroutine;
     GameObject tempObj;
     string currentReadyLink;
@@ -100,36 +100,41 @@ public class ImportFloorMaps : MonoBehaviour
                 File.Delete(file.ToString());
 
             }
-            importImage = StartCoroutine(DownloadImage());
+            DownloadImages();
         }
     }
 
-    IEnumerator DownloadImage()
+    void DownloadImages()
     {
         foreach( string link in listOfMapsLinks)
         {
-            string imageId = link.Split('/')[5];
-            currentReadyLink = "https://drive.google.com/uc?id=" + imageId;
-            string currentFileName = id + " Floor.png";
-            currentFilePath = Path.Combine(folderPath, currentFileName);
-            listOfMapsPaths.Add(currentFilePath);
+            importImages = StartCoroutine(DownloadImage(link));
+        }
+        importImages = null;
+    }
 
-            UnityWebRequest imageRequest = UnityWebRequestTexture.GetTexture(currentReadyLink);
-            var operation = imageRequest.SendWebRequest();
+    IEnumerator DownloadImage(string link)
+    {
+        string imageId = link.Split('/')[5];
+        currentReadyLink = "https://drive.google.com/uc?id=" + imageId;
+        string currentFileName = id + " Floor.png";
+        currentFilePath = Path.Combine(folderPath, currentFileName);
+        listOfMapsPaths.Add(currentFilePath);
 
-            while (!imageRequest.isDone)
-            {
-                progress = operation.progress;
-                yield return null;
-            }
-            progress = 1f;
-            Texture2D texture = DownloadHandlerTexture.GetContent(imageRequest);
-            byte[] bytes = texture.EncodeToPNG();
-            print(currentFilePath);
-            File.WriteAllBytes(currentFilePath, bytes);
-            id++;
-            importImage = null;
-        }   
+        UnityWebRequest imageRequest = UnityWebRequestTexture.GetTexture(currentReadyLink);
+        var operation = imageRequest.SendWebRequest();
+
+        while (!imageRequest.isDone)
+        {
+            progress = operation.progress;
+            yield return null;
+        }
+        progress = 1f;
+        Texture2D texture = DownloadHandlerTexture.GetContent(imageRequest);
+        byte[] bytes = texture.EncodeToPNG();
+        print(currentFilePath);
+        File.WriteAllBytes(currentFilePath, bytes);
+        id++;
     }
 
     private void ShowImage()
