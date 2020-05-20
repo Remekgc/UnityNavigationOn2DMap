@@ -25,12 +25,18 @@ public class ImportFloorMaps : MonoBehaviour
     [SerializeField] GameObject contentList;
     float progress;
     Texture2D tempTexture;
-    [SerializeField] Image testImage;
+    [SerializeField] Image floorMapPreview;
     Coroutine importImage;
     Coroutine showImageCoroutine;
     GameObject tempObj;
     string currentReadyLink;
     int id = 0;
+
+    [SerializeField] Canvas menuCanvas;
+    [SerializeField] Canvas mapCanvas;
+
+    [SerializeField] GameObject beaconController;
+    [SerializeField] GameObject map;
 
     private void Start()
     {
@@ -46,15 +52,13 @@ public class ImportFloorMaps : MonoBehaviour
         int imageNum = 0;
         foreach (string mapString in listOfMapsLinks)
         {
-            Button instantiatedButton = Instantiate(button);
+            Button instantiatedButton = Instantiate(button, contentList.transform);
             instantiatedButton.name = imageNum + "_floorMap";
             instantiatedButton.GetComponentInChildren<TextMeshProUGUI>().text = imageNum + " Floor map";
-            instantiatedButton.transform.SetParent(contentList.transform);
-            instantiatedButton.transform.localScale = NORMAL_SCALE;
             instantiatedButton.GetComponent<Button>().onClick.AddListener(ShowImage);
+
             imageNum++;
         }
-        imageNum = 0;
     }
 
     private void CheckForFolder()
@@ -123,14 +127,6 @@ public class ImportFloorMaps : MonoBehaviour
             byte[] bytes = texture.EncodeToPNG();
             print(currentFilePath);
             File.WriteAllBytes(currentFilePath, bytes);
-
-            Button instantiatedButton = Instantiate(button);
-            instantiatedButton.name = id + "_floorMap";
-            instantiatedButton.GetComponentInChildren<TextMeshProUGUI>().text = id + " Floor map";
-            instantiatedButton.transform.SetParent(contentList.transform);
-            instantiatedButton.transform.localScale = NORMAL_SCALE;
-            instantiatedButton.GetComponent<Button>().onClick.AddListener(ShowImage);
-
             id++;
             importImage = null;
         }   
@@ -140,29 +136,31 @@ public class ImportFloorMaps : MonoBehaviour
     {
         showImageCoroutine = StartCoroutine(OpenFloorMap());
     }
+
     IEnumerator OpenFloorMap()
     {
         int index = int.Parse(EventSystem.current.currentSelectedGameObject.name.Split('_')[0]);
         print(index);
-        if (!testImage.IsActive())
+        WWW www = new WWW(listOfMapsPaths[index]);
+        yield return www;
+        Texture2D tempTexture = www.texture;
+        floorMapPreview.sprite = Sprite.Create(tempTexture, new Rect(x: 0, y: 0, tempTexture.width, tempTexture.height), new Vector2(x: 0, y: 0));
+        floorMapPreview.SetNativeSize();
+        //floorMapPreview.rectTransform.sizeDelta = new Vector2(floorMapPreview.rectTransform.sizeDelta.x * 1.7f, floorMapPreview.rectTransform.sizeDelta.y * 1.7f);
+        
+        if (!floorMapPreview.IsActive())
         {
-            WWW www = new WWW(listOfMapsPaths[index]);
-            yield return www;
-            Texture2D tempTexture = www.texture;
-            testImage.sprite = Sprite.Create(tempTexture, new Rect(x: 0, y: 0, tempTexture.width, tempTexture.height), new Vector2(x: 0, y: 0));
-            //var objTransform = testImage.transform as RectTransform;
-            //objTransform.sizeDelta = new Vector2(tempTexture.width, tempTexture.height);
-            testImage.gameObject.SetActive(true);
-        }
-        else
-        {
-            WWW www = new WWW(listOfMapsPaths[index]);
-            yield return www;
-            Texture2D tempTexture = www.texture;
-            testImage.sprite = Sprite.Create(tempTexture, new Rect(x: 0, y: 0, tempTexture.width, tempTexture.height), new Vector2(x: 0, y: 0));
-            //var objTransform = testImage.transform as RectTransform;
-            //objTransform.sizeDelta = new Vector2(tempTexture.width, tempTexture.height);
+            floorMapPreview.gameObject.SetActive(true);
         }
         showImageCoroutine = null;
+    }
+
+    public void ChooseFloor()
+    {
+        menuCanvas.gameObject.SetActive(false);
+        mapCanvas.gameObject.SetActive(true);
+        beaconController.SetActive(true);
+        map.SetActive(true);
+        map.GetComponent<SpriteRenderer>().sprite = floorMapPreview.sprite;
     }
 }
