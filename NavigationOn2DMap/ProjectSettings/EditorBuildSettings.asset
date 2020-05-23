@@ -5,7 +5,7 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Pavlo/p_test.unity
     guid: f1349c7a976456f4e8e002bb737e99ae
   - enabled: 0
