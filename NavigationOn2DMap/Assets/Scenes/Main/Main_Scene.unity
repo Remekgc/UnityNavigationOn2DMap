@@ -151,8 +151,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gps: {fileID: 432197333}
-  lat: 0
-  log: 0
+  latitude: 0
+  longitude: 0
+  selectAccuracy: 0.02
   gpsLoading: 0
   gpsReady: 0
   sqlManager: {fileID: 1344859291}
@@ -690,6 +691,7 @@ MonoBehaviour:
   buildingLongitude: 
   sqlData: {fileID: 1344859293}
   sqlManager: {fileID: 1344859291}
+  gpsEnabled: 0
 --- !u!1 &513255165
 GameObject:
   m_ObjectHideFlags: 0

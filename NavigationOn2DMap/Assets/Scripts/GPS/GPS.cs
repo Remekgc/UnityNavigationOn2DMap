@@ -21,6 +21,8 @@ public class GPS : MonoBehaviour
 
     private List<double> distanceToBuilding;
 
+    public bool gpsEnabled = false;
+
     void Start()
     {
         latitude = 51.27639;
@@ -28,51 +30,54 @@ public class GPS : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
         //StartCoroutine(StartLocationService());
-        GetDatabaseData();
+        //GetDatabaseData();
 
     }
     private void Update()
     {
-        //Debug.Log("Count: "+sqlManager.selectQueryResult.Count());
-        if (sqlManager.SelectQueryDone)
+        if (gpsEnabled)
         {
-            //Debug.Log("Test: " + sqlManager.selectQueryResult[0][3]);
-            if (buildingLatitude == ""&& buildingLongitude != sqlManager.selectQueryResult[0][3])
-                buildingLatitude = sqlManager.selectQueryResult[0][3];
-            else if (buildingLongitude == "" && buildingLatitude != sqlManager.selectQueryResult[0][4])
-                buildingLongitude = sqlManager.selectQueryResult[0][4];
-        }
-        if (buildingLongitude != buildingLatitude && buildingLongitude != "" && buildingLatitude != "" && oldBuildingLatitude != buildingLatitude && oldBuildingLongitude != buildingLongitude)
-        {
-            oldBuildingLatitude = buildingLatitude;
-            oldBuildingLongitude = buildingLongitude;
-            coordinates = new Point(latitude, longitude);
-            var latitudeList = buildingLatitude.Split(';').Select(double.Parse).ToList();
-            List<double> longitudeList = new List<double>(Array.ConvertAll(buildingLongitude.Split(';'), double.Parse));
-
-            List<Point> distanceBuildingPlayer = new List<Point>();
-
-            distanceBuildingPlayer.Add(new Point(((latitudeList[0] + latitudeList[1]) / 2) - latitude, ((longitudeList[0] + longitudeList[1]) / 2) - longitude));
-
-           // Debug.Log(distanceBuildingPlayer[0].latitude+"/"+distanceBuildingPlayer[0].longitude);
-
-            double distance =0;
-            for(int i = 0; i<distanceBuildingPlayer.Count; i++)
+            //Debug.Log("Count: "+sqlManager.selectQueryResult.Count());
+            if (sqlManager.selectQueryDone)
             {
-                if (distanceBuildingPlayer[i].latitude > distance)
-                    distance = distanceBuildingPlayer[i].latitude;
+                //Debug.Log("Test: " + sqlManager.selectQueryResult[0][3]);
+                if (buildingLatitude == "" && buildingLongitude != sqlManager.selectQueryResult[0][3])
+                    buildingLatitude = sqlManager.selectQueryResult[0][3];
+                else if (buildingLongitude == "" && buildingLatitude != sqlManager.selectQueryResult[0][4])
+                    buildingLongitude = sqlManager.selectQueryResult[0][4];
             }
-
-           // Debug.Log(latitudeList[0]);
-            //Debug.Log(longitudeList[0]);
-            List<Point> points = new List<Point>();
-            for (int i = 0; i < latitudeList.Count; i++)
+            if (buildingLongitude != buildingLatitude && buildingLongitude != "" && buildingLatitude != "" && oldBuildingLatitude != buildingLatitude && oldBuildingLongitude != buildingLongitude)
             {
-                points.Add(new Point(latitudeList[i], longitudeList[i]));
+                oldBuildingLatitude = buildingLatitude;
+                oldBuildingLongitude = buildingLongitude;
+                coordinates = new Point(latitude, longitude);
+                var latitudeList = buildingLatitude.Split(';').Select(double.Parse).ToList();
+                List<double> longitudeList = new List<double>(Array.ConvertAll(buildingLongitude.Split(';'), double.Parse));
+
+                List<Point> distanceBuildingPlayer = new List<Point>();
+
+                distanceBuildingPlayer.Add(new Point(((latitudeList[0] + latitudeList[1]) / 2) - latitude, ((longitudeList[0] + longitudeList[1]) / 2) - longitude));
+
+                // Debug.Log(distanceBuildingPlayer[0].latitude+"/"+distanceBuildingPlayer[0].longitude);
+
+                double distance = 0;
+                for (int i = 0; i < distanceBuildingPlayer.Count; i++)
+                {
+                    if (distanceBuildingPlayer[i].latitude > distance)
+                        distance = distanceBuildingPlayer[i].latitude;
+                }
+
+                // Debug.Log(latitudeList[0]);
+                //Debug.Log(longitudeList[0]);
+                List<Point> points = new List<Point>();
+                for (int i = 0; i < latitudeList.Count; i++)
+                {
+                    points.Add(new Point(latitudeList[i], longitudeList[i]));
+                }
+                // Debug.Log(points.Count);
+                //if(points.Count>=4)
+                // Debug.Log(IsInsideBuilding(points, coordinates));
             }
-           // Debug.Log(points.Count);
-            //if(points.Count>=4)
-               // Debug.Log(IsInsideBuilding(points, coordinates));
         }
     }
 
@@ -95,7 +100,7 @@ public class GPS : MonoBehaviour
         sqlManager.ExecuteReaderQuery("SELECT * FROM Building WHERE Latitude BETWEEN '"+minLatitude+"' AND '"+maxLatitude+"' AND Longitude BETWEEN '"+minLongitude+"' AND '"+maxLongitude+"'");
         while (true)
         {
-            if (sqlManager.SelectQueryDone)
+            if (sqlManager.selectQueryDone)
             {
                 foreach (var x in sqlManager.selectQueryResult)
                 {
@@ -104,7 +109,7 @@ public class GPS : MonoBehaviour
                         print(y);
                     }
                 }
-                sqlManager.SelectQueryDone = false;
+                sqlManager.selectQueryDone = false;
                 yield break;
             }
             else

@@ -13,7 +13,9 @@ public class TestingComponents : MonoBehaviour
 
     [Header("GPS")]
     [SerializeField] private protected GPS gps;
-    [SerializeField] float lat, log;
+    [SerializeField] float latitude, longitude;
+    [SerializeField][Range(0.01f, 0.09f)][Tooltip("This controls how accurate the select from our database will be.")]
+    float selectAccuracy = 0.02f;
     [SerializeField] bool gpsLoading, gpsReady = false;
     [Header("SQL")]
     [SerializeField] private protected SQLManager sqlManager;
@@ -63,7 +65,7 @@ public class TestingComponents : MonoBehaviour
             {
                 if (!sqlLoading)
                 {
-                    StartCoroutine(IGetDatabaseData(lat, log));
+                    StartCoroutine(IGetDatabaseData(latitude, longitude));
                     sqlLoading = true;
                     yield return new WaitForSeconds(1f);
                     continue;
@@ -99,16 +101,19 @@ public class TestingComponents : MonoBehaviour
 
     private IEnumerator IGetGPSData()
     {
-        Debug.Log("IGetGPSData started");
+        print("IGetGPSData started");
         //gps.getLatLog()
+
         while (true)
         {
             if (true) //if gps.locatingFinished
             {
                 // lat = gps.getLatitude()
                 // log = gps.getLongitude()
-                lat = 51.27f;
-                log = 22.55f;
+                // latitude = 51.276419f;
+                // longitude = 22.551123f;
+                latitude = 0;
+                longitude = 0;
                 gpsReady = true;
                 yield break;
             }
@@ -122,130 +127,103 @@ public class TestingComponents : MonoBehaviour
 
     private IEnumerator IGetDatabaseData(float lat, float log)
     {
-        /* Adrian
-         * In here we have to create the building object
-         * building has ID, buildingName, imageLink and list of beacons of type MapBeacon so
-         * 1. Get the building ID, name and image link with GPS data(lat, log)
-         * 2. Get the List of Beacons with the building ID, MapBeacon object type has ID, RoomName, SSID, Vector2 MapPos that is X and Y in the database and List of Sensors (BeaconSensor type) - Done
-         * 3. Get List of Sensors for the MapBeacon, BeaconSensor has name and value - Done
-         * 4. Create the building object - Done
-         */
-        
-
-        Debug.Log("IGetDatabaseData started");
-        //sqlManager.ExecuteReaderQuery("SELECT Name FROM Building WHERE Name = 'Adrian_Home'");
-        //sqlManager.ExecuteReaderQuery("SELECT * FROM Building");
+        print("IGetDatabaseData started");
 
         bool buildingDataReady = false;
-        sqlManager.ExecuteReaderQuery("SELECT * FROM Building WHERE Name = 'Adrian_Home'");
+        sqlManager.ExecuteReaderQuery("SELECT * FROM Building WHERE Latitude BETWEEN '" + (lat - selectAccuracy) + "' AND '" + (lat + selectAccuracy) + "' AND Longitude BETWEEN '" + (log - selectAccuracy) + "' AND '" + (log + selectAccuracy) + "'");
 
         // Getting building data
-        while (!buildingDataReady)
+        while (!buildingDataReady && !sqlManager.emptyQueryResult)
         {
-            if (sqlManager.SelectQueryDone)
+            if (sqlManager.selectQueryDone && sqlManager.selectQueryResult.Count > 0)
             {
-                List<string> data = new List<string>();
-
-                foreach (var x in sqlManager.selectQueryResult)
+                List<Building> buildingsToCompare = new List<Building>();
+                foreach (var buildingData in sqlManager.selectQueryResult)
                 {
-                    foreach (var y in x)
+                    buildingsToCompare.Add(new Building(
+                        int.Parse(buildingData[0]), // ID
+                        buildingData[1], // Name
+                        buildingData[2], // img Link
+                        new Vector2(float.Parse(buildingData[3]), float.Parse(buildingData[4])) // coordinates
+                        ));
+                }
+
+                float dist = 0f;
+                foreach (var b in buildingsToCompare)
+                {
+                    if (building == null)
                     {
-                        data.Add(y);
+                        building = b;
+                        dist = Vector2.Distance(b.Coordinates, new Vector2(lat, log));
+                    }
+                    else if (Vector2.Distance(building.Coordinates, b.Coordinates) < dist)
+                    {
+                        building = b;
                     }
                 }
-                sqlManager.SelectQueryDone = false;
 
-                building = new Building(int.Parse(data[0]), data[1], data[2]);
-
+                sqlManager.selectQueryDone = false;
                 buildingDataReady = true;
             }
             else
             {
                 print("Waiting for the query to complete!");
-                yield return new WaitForSeconds(2);
+                yield return new WaitForSeconds(1);
             }
         }
 
         bool mapBeaconsDataReady = false;
-        sqlManager.ExecuteReaderQuery("SELECT * FROM Beacon WHERE BuildingID = " + building.ID);
+        if (!sqlManager.emptyQueryResult) sqlManager.ExecuteReaderQuery("SELECT * FROM Beacon WHERE BuildingID = " + building.ID);
 
-        while (!mapBeaconsDataReady)
+        while (!mapBeaconsDataReady && !sqlManager.emptyQueryResult)
         {
-            if (sqlManager.SelectQueryDone)
+            if (sqlManager.selectQueryDone)
             {
-                List<List<string>> data = new List<List<string>>();
-                int dataid = 0;
-
-                foreach (var x in sqlManager.selectQueryResult)
-                {
-                    data.Add(new List<string>());
-                    foreach (var y in x)
-                    {
-                        data[dataid].Add(y);
-                        print(y);
-                    }
-                    dataid++;
-                }
-                sqlManager.SelectQueryDone = false;
-                dataid = 0;
-
-                foreach (var x in data)
+                foreach (var beaconData in sqlManager.selectQueryResult)
                 {
                     building.Beacons.Add(
-                        new MapBeacon(
-                            int.Parse(data[dataid][0]),
-                            data[dataid][1],
-                            new Vector2(int.Parse(data[dataid][2]), int.Parse(data[dataid][3])),
-                            data[dataid][4])
-                        );
-                    dataid++;
+                    new MapBeacon(
+                        int.Parse(beaconData[0]),
+                        beaconData[1],
+                        new Vector2(int.Parse(beaconData[2]), int.Parse(beaconData[3])),
+                        beaconData[4])
+                    );
                 }
 
                 mapBeaconsDataReady = true;
+                sqlManager.selectQueryDone = false;
             }
             else
             {
                 print("Waiting for the query to complete!");
-                yield return new WaitForSeconds(2);
+                yield return new WaitForSeconds(1);
             }
         }
 
-        
-        foreach (var beacon in building.Beacons)
+        if (!sqlManager.emptyQueryResult)
         {
-            bool beaconSensorsReady = false;
-            sqlManager.ExecuteReaderQuery("SELECT * FROM Sensor WHERE BeaconID = " + beacon.ID);
-
-            while (!beaconSensorsReady)
+            foreach (var beacon in building.Beacons)
             {
-                if (sqlManager.SelectQueryDone)
-                {
-                    List<List<string>> data = new List<List<string>>();
-                    int dataid = 0;
+                bool beaconSensorsReady = false;
+                sqlManager.ExecuteReaderQuery("SELECT * FROM Sensor WHERE BeaconID = " + beacon.ID);
 
-                    foreach (var x in sqlManager.selectQueryResult)
+                while (!beaconSensorsReady && !sqlManager.emptyQueryResult)
+                {
+                    if (sqlManager.selectQueryDone)
                     {
-                        data.Add(new List<string>());
-                        foreach (var y in x)
+                        foreach (var sensorData in sqlManager.selectQueryResult)
                         {
-                            data[dataid].Add(y);
-                            print(y);
+                            beacon.Sensors.Add(new BeaconSensor(sensorData[1], float.Parse(sensorData[2])));
                         }
-                        dataid++;
-                    }
 
-                    foreach (var x in data)
+                        sqlManager.selectQueryDone = false;
+                        beaconSensorsReady = true;
+                    }
+                    else
                     {
-                        beacon.sensors.Add(new BeaconSensor(x[1], float.Parse(x[2])));
+                        print("Waiting for the query to complete!");
+                        yield return new WaitForSeconds(1);
                     }
-
-                    sqlManager.SelectQueryDone = false;
-                    beaconSensorsReady = true;
-                }
-                else
-                {
-                    print("Waiting for the query to complete!");
-                    yield return new WaitForSeconds(2);
                 }
             }
         }
@@ -253,5 +231,11 @@ public class TestingComponents : MonoBehaviour
         print("welp it worked XDDDD");
         sqlReady = true;
         yield break;
+    }
+
+    void failedToGetNavigation()
+    {
+        print("No Buildings Found");
+        Destroy(gameObject);
     }
 }

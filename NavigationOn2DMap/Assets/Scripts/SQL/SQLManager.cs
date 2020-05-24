@@ -16,19 +16,10 @@ public class SQLManager : MonoBehaviour
                             "password=compass123";
     private Thread selectQueryThread;
 
-    public bool threadDone = false, SelectQueryDone = true;
+    public bool threadDone = false, selectQueryDone = true, emptyQueryResult = false;
     [SerializeField] protected TextMeshProUGUI SQLText;
-    public string testData, QueryStatement;
+    public string testData, queryStatement;
     public List<List<string>> selectQueryResult = new List<List<string>>();
-
-    void Start()
-    {
-        /*var testThread = new Thread(getData);
-        data = "Connecting to SQL";
-        SQLText.text += data;
-        testThread.Start();*/
-        //ExecuteReaderQuery("SELECT Name FROM Building WHERE Name = 'Adrian_Home'");
-    }
 
     public void ExecuteReaderQuery(string sqlQuery)
     {
@@ -38,8 +29,7 @@ public class SQLManager : MonoBehaviour
         }
         else // Otherwise creating a new thread and running it
         {
-            SelectQueryDone = false;
-            QueryStatement = sqlQuery;
+            queryStatement = sqlQuery;
             selectQueryThread = new Thread(ReaderQuery);
             selectQueryThread.Start();
         }
@@ -47,11 +37,14 @@ public class SQLManager : MonoBehaviour
 
     public void ReaderQuery()
     {
+        emptyQueryResult = false;
+        selectQueryDone = false;
+
         MySqlConnection sqlConnection = new MySqlConnection(ConnStr); // Creating sql connection with defined connection data
         try
         {
             sqlConnection.Open();
-            MySqlCommand cmd = new MySqlCommand(QueryStatement, sqlConnection); // Creating new sql qurey command
+            MySqlCommand cmd = new MySqlCommand(queryStatement, sqlConnection); // Creating new sql qurey command
             MySqlDataReader dataReader = cmd.ExecuteReader();
 
             selectQueryResult.Clear();
@@ -63,47 +56,23 @@ public class SQLManager : MonoBehaviour
                 for (int i = 0; i < dataReader.FieldCount; i++)
                 {
                     selectQueryResult[listID].Add(dataReader[i].ToString());
+                    print(dataReader[i].ToString());
                 }
                 listID++;
             }
             dataReader.Close();
+
+            if (listID == 0)
+            {
+                emptyQueryResult = true;
+                throw new EmptyResult();
+            }
         }
         catch (Exception ex)
         {
             print("Reader Querry error: " + ex);
         }
-        SelectQueryDone = true;
-    }
-
-    // Test Fuction - not important
-    private void GetTestData()
-    {
-        MySqlConnection conn = new MySqlConnection(ConnStr);
-        try
-        {
-            //print("Connecting to MySQL...");
-            conn.Open();
-
-            string sql = "SELECT * FROM Test";
-            MySqlCommand cmd = new MySqlCommand(sql, conn);
-            MySqlDataReader rdr = cmd.ExecuteReader();
-
-            testData = "";
-            while (rdr.Read())
-            {
-                //print(rdr[0] + " -- " + rdr[1]);
-                testData += rdr[0] + " " + rdr[1] + "\n";
-            }
-            rdr.Close();
-        }
-        catch
-        {
-            testData = "Failed to connect";
-        }
-
-        conn.Close();
-        //print("Done.");
-        threadDone = !threadDone;
+        selectQueryDone = true;
     }
 
     void Update()

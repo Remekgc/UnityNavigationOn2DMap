@@ -7,15 +7,15 @@ public class MapBeacon
     public int ID;
     public string RoomName;
     public string SSID;
-    public Vector2 mapPos;
-    public List<BeaconSensor> sensors = new List<BeaconSensor>();
+    public Vector2 MapPos;
+    public List<BeaconSensor> Sensors = new List<BeaconSensor>();
 
-    public MapBeacon(int id, string roomName, Vector2 pos, string ssid)
+    public MapBeacon(int id, string roomName, Vector2 mapPos, string ssid)
     {
         ID = id;
         RoomName = roomName;
         SSID = ssid;
-        mapPos = pos;
+        MapPos = mapPos;
     }
 
 }
