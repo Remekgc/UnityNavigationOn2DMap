@@ -30,6 +30,8 @@ public class SQLManager : MonoBehaviour
         else // Otherwise creating a new thread and running it
         {
             queryStatement = sqlQuery;
+            emptyQueryResult = false;
+            selectQueryDone = false;
             selectQueryThread = new Thread(ReaderQuery);
             selectQueryThread.Start();
         }
@@ -37,9 +39,6 @@ public class SQLManager : MonoBehaviour
 
     public void ReaderQuery()
     {
-        emptyQueryResult = false;
-        selectQueryDone = false;
-
         MySqlConnection sqlConnection = new MySqlConnection(ConnStr); // Creating sql connection with defined connection data
         try
         {
@@ -56,7 +55,6 @@ public class SQLManager : MonoBehaviour
                 for (int i = 0; i < dataReader.FieldCount; i++)
                 {
                     selectQueryResult[listID].Add(dataReader[i].ToString());
-                    print(dataReader[i].ToString());
                 }
                 listID++;
             }
