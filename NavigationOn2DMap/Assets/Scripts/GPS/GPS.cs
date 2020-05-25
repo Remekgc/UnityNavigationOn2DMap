@@ -17,7 +17,7 @@ public class GPS : MonoBehaviour
     public List<Point> points;
     public SimpleSQLUserScriptExample sqlData;
     [SerializeField] protected SQLManager sqlManager;
-    private Point coordinates;
+    public Point coordinates;
 
     private List<double> distanceToBuilding;
 
@@ -30,6 +30,7 @@ public class GPS : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
         //StartCoroutine(StartLocationService());
+        coordinates = new Point(latitude, longitude);
         //GetDatabaseData();
 
     }
@@ -50,7 +51,6 @@ public class GPS : MonoBehaviour
             {
                 oldBuildingLatitude = buildingLatitude;
                 oldBuildingLongitude = buildingLongitude;
-                coordinates = new Point(latitude, longitude);
                 var latitudeList = buildingLatitude.Split(';').Select(double.Parse).ToList();
                 List<double> longitudeList = new List<double>(Array.ConvertAll(buildingLongitude.Split(';'), double.Parse));
 
@@ -79,6 +79,11 @@ public class GPS : MonoBehaviour
                 // Debug.Log(IsInsideBuilding(points, coordinates));
             }
         }
+    }
+
+    public Point getPosition()
+    {
+        return coordinates;
     }
 
     public void GetDatabaseData()
@@ -118,7 +123,6 @@ public class GPS : MonoBehaviour
                 yield return new WaitForSecondsRealtime(2);
             }
         }
-
     }
 
     //tego nie ruszac bo zabije
@@ -167,7 +171,6 @@ public class GPS : MonoBehaviour
             Debug.Log("Unable to determine device location");
             yield break;
         }
-
 
         yield break;
     }
