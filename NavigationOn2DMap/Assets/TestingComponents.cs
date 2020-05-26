@@ -20,7 +20,7 @@ public class TestingComponents : MonoBehaviour
     [SerializeField] bool sqlLoading, sqlReady = false;
     [SerializeField] private protected Building building;
     [Header("Image Loader")]
-    [SerializeField] private protected GameObject Image; // Pavlo: Change to ImageManager or somethin
+    [SerializeField] private protected ImportFloorMaps floorMapsImporter; // Pavlo: Change to ImageManager or somethin
     [SerializeField] bool imageLoading, imageReady = false;
     //Pavlo: ImageLoader imageloader;
 
@@ -79,7 +79,7 @@ public class TestingComponents : MonoBehaviour
             {
                 if (!imageLoading)
                 {
-                    //StartCoroutine();
+                    StartCoroutine(floorMapsImporter.DownloadImage(building.ImageLink, building.Name, building.ID));
                     print("Image Loaded");
                     imageLoading = true;
                     imageReady = true;

@@ -13,10 +13,9 @@ public class ImportFloorMaps : MonoBehaviour
     Vector3 NORMAL_SCALE = new Vector3(1, 1, 1);
     [SerializeField] List<string> listOfMapsLinks;
     [SerializeField] List<string> listOfMapsPaths;
-    string imageLink = "https://drive.google.com/file/d/1CJ7QxTPCnQ_ne9n6Kl9TH8ANmuf5lIQt/view?usp=sharing";
-    string imageLink2 = "https://drive.google.com/file/d/1aPNeii8yoJEyep3qJgi-_fPTQBu0DcRx/view?usp=sharing";
+    //string imageLink = "https://drive.google.com/file/d/1CJ7QxTPCnQ_ne9n6Kl9TH8ANmuf5lIQt/view?usp=sharing";
+    //string imageLink2 = "https://drive.google.com/file/d/1aPNeii8yoJEyep3qJgi-_fPTQBu0DcRx/view?usp=sharing";
     string buildingName = "WSEI";
-    string fileName;
     string appPath;
     string folderPath;
     string currentFilePath;
@@ -24,13 +23,10 @@ public class ImportFloorMaps : MonoBehaviour
     [SerializeField] Button button;
     [SerializeField] GameObject contentList;
     float progress;
-    Texture2D tempTexture;
     [SerializeField] Image floorMapPreview;
     Coroutine importImages;
     Coroutine showImageCoroutine;
-    GameObject tempObj;
     string currentReadyLink;
-    int id = 0;
 
     [SerializeField] Canvas menuCanvas;
     [SerializeField] Canvas mapCanvas;
@@ -40,8 +36,6 @@ public class ImportFloorMaps : MonoBehaviour
 
     private void Start()
     {
-        listOfMapsLinks.Add(imageLink);
-        listOfMapsLinks.Add(imageLink2);
         appPath = Path.GetDirectoryName(Application.persistentDataPath);
         folderPath = Path.Combine(appPath, buildingName);
         CheckForFolder();
@@ -63,15 +57,11 @@ public class ImportFloorMaps : MonoBehaviour
 
     private void CheckForFolder()
     {
-        if (Directory.Exists(folderPath))
-        {
-            CheckForMaps();
-        }
-        else
+        if (!Directory.Exists(folderPath))
         {
             Directory.CreateDirectory(folderPath);
-            CheckForMaps();
         }
+        CheckForMaps();
     }
 
     private void CheckForMaps()
@@ -100,28 +90,28 @@ public class ImportFloorMaps : MonoBehaviour
                 File.Delete(file.ToString());
 
             }
-            DownloadImages();
+            //DownloadImages();
         }
     }
 
-    void DownloadImages()
-    {
-        foreach( string link in listOfMapsLinks)
-        {
-            importImages = StartCoroutine(DownloadImage(link));
-        }
-        importImages = null;
-    }
+    //void DownloadImages()
+    //{
+    //    foreach( string link in listOfMapsLinks)
+    //    {
+    //        importImages = StartCoroutine(DownloadImage(link));
+    //    }
+    //    importImages = null;
+    //}
 
-    IEnumerator DownloadImage(string link)
+    public IEnumerator DownloadImage(string link, string buildingName, int buildingId)
     {
-        string imageId = link.Split('/')[5];
-        currentReadyLink = "https://drive.google.com/uc?id=" + imageId;
-        string currentFileName = id + " Floor.png";
-        currentFilePath = Path.Combine(folderPath, currentFileName);
-        listOfMapsPaths.Add(currentFilePath);
-
-        UnityWebRequest imageRequest = UnityWebRequestTexture.GetTexture(currentReadyLink);
+        //string imageId = link.Split('/')[5];
+        //string readyLink = "https://drive.google.com/uc?id=" + imageId;
+        string fileName = buildingName + buildingId + ".png";
+        string filePath = Path.Combine(folderPath, fileName);
+        listOfMapsPaths.Add(filePath);
+        //UnityWebRequest imageRequest = UnityWebRequestTexture.GetTexture(readyLink);
+        UnityWebRequest imageRequest = UnityWebRequestTexture.GetTexture(link);
         var operation = imageRequest.SendWebRequest();
 
         while (!imageRequest.isDone)
@@ -132,9 +122,8 @@ public class ImportFloorMaps : MonoBehaviour
         progress = 1f;
         Texture2D texture = DownloadHandlerTexture.GetContent(imageRequest);
         byte[] bytes = texture.EncodeToPNG();
-        print(currentFilePath);
-        File.WriteAllBytes(currentFilePath, bytes);
-        id++;
+        File.WriteAllBytes(filePath, bytes);
+        print("image was downloaded on: " + File.GetCreationTime(filePath));
     }
 
     private void ShowImage()
