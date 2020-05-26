@@ -10,23 +10,32 @@ using UnityEngine.UI;
 
 public class ImportFloorMaps : MonoBehaviour
 {
+    [Header("Remi")]
+    public bool imageReady = false;
+    public Texture2D imageTexture;
+    
     Vector3 NORMAL_SCALE = new Vector3(1, 1, 1);
+    [Header("Pavlo")]
     [SerializeField] List<string> listOfMapsLinks;
     [SerializeField] List<string> listOfMapsPaths;
-    //string imageLink = "https://drive.google.com/file/d/1CJ7QxTPCnQ_ne9n6Kl9TH8ANmuf5lIQt/view?usp=sharing";
-    //string imageLink2 = "https://drive.google.com/file/d/1aPNeii8yoJEyep3qJgi-_fPTQBu0DcRx/view?usp=sharing";
+    string imageLink = "https://drive.google.com/file/d/1CJ7QxTPCnQ_ne9n6Kl9TH8ANmuf5lIQt/view?usp=sharing";
+    string imageLink2 = "https://drive.google.com/file/d/1aPNeii8yoJEyep3qJgi-_fPTQBu0DcRx/view?usp=sharing";
     string buildingName = "WSEI";
+    string fileName;
     string appPath;
     string folderPath;
-    string currentFilePath;
+    public string currentFilePath;
     string currentImageLink = null;
     [SerializeField] Button button;
     [SerializeField] GameObject contentList;
     float progress;
+    Texture2D tempTexture;
     [SerializeField] Image floorMapPreview;
     Coroutine importImages;
     Coroutine showImageCoroutine;
+    GameObject tempObj;
     string currentReadyLink;
+    int id = 0;
 
     [SerializeField] Canvas menuCanvas;
     [SerializeField] Canvas mapCanvas;
@@ -36,6 +45,8 @@ public class ImportFloorMaps : MonoBehaviour
 
     private void Start()
     {
+        listOfMapsLinks.Add(imageLink);
+        listOfMapsLinks.Add(imageLink2);
         appPath = Path.GetDirectoryName(Application.persistentDataPath);
         folderPath = Path.Combine(appPath, buildingName);
         CheckForFolder();
@@ -57,11 +68,15 @@ public class ImportFloorMaps : MonoBehaviour
 
     private void CheckForFolder()
     {
-        if (!Directory.Exists(folderPath))
+        if (Directory.Exists(folderPath))
+        {
+            CheckForMaps();
+        }
+        else
         {
             Directory.CreateDirectory(folderPath);
+            CheckForMaps();
         }
-        CheckForMaps();
     }
 
     private void CheckForMaps()
@@ -81,7 +96,7 @@ public class ImportFloorMaps : MonoBehaviour
         if(fileCounter == listOfMapsLinks.Count)
         {
             fileCounter = 0;
-            CreateButtons();
+            //CreateButtons();
         }
         else
         {
@@ -90,28 +105,34 @@ public class ImportFloorMaps : MonoBehaviour
                 File.Delete(file.ToString());
 
             }
-            //DownloadImages();
+            DownloadImages();
         }
     }
 
-    //void DownloadImages()
-    //{
-    //    foreach( string link in listOfMapsLinks)
-    //    {
-    //        importImages = StartCoroutine(DownloadImage(link));
-    //    }
-    //    importImages = null;
-    //}
-
-    public IEnumerator DownloadImage(string link, string buildingName, int buildingId)
+    void DownloadImages()
     {
-        //string imageId = link.Split('/')[5];
-        //string readyLink = "https://drive.google.com/uc?id=" + imageId;
-        string fileName = buildingName + buildingId + ".png";
-        string filePath = Path.Combine(folderPath, fileName);
-        listOfMapsPaths.Add(filePath);
-        //UnityWebRequest imageRequest = UnityWebRequestTexture.GetTexture(readyLink);
-        UnityWebRequest imageRequest = UnityWebRequestTexture.GetTexture(link);
+        foreach( string link in listOfMapsLinks)
+        {
+            importImages = StartCoroutine(DownloadImage(link));
+        }
+        importImages = null;
+    }
+
+    public void DownloadImageFromLink(string link)
+    {
+        imageReady = false;
+        StartCoroutine(DownloadImage2(link));
+    }
+
+    IEnumerator DownloadImage(string link)
+    {
+        string imageId = link.Split('/')[5];
+        currentReadyLink = "https://drive.google.com/uc?id=" + imageId;
+        string currentFileName = id + " Floor.png";
+        currentFilePath = Path.Combine(folderPath, currentFileName);
+        listOfMapsPaths.Add(currentFilePath);
+
+        UnityWebRequest imageRequest = UnityWebRequestTexture.GetTexture(currentReadyLink);
         var operation = imageRequest.SendWebRequest();
 
         while (!imageRequest.isDone)
@@ -122,8 +143,35 @@ public class ImportFloorMaps : MonoBehaviour
         progress = 1f;
         Texture2D texture = DownloadHandlerTexture.GetContent(imageRequest);
         byte[] bytes = texture.EncodeToPNG();
-        File.WriteAllBytes(filePath, bytes);
-        print("image was downloaded on: " + File.GetCreationTime(filePath));
+        print(currentFilePath);
+        File.WriteAllBytes(currentFilePath, bytes);
+        id++;
+    }
+
+    IEnumerator DownloadImage2(string link)
+    {
+        /* TODO: Pavlo
+         * !!! we will add functionallity with many images to the navigation later !!!
+         * 1: Check if the image is already downloaded(skip if there is no such functionallity) and download the image if needed
+         * 2: Instantiate that image on the scene
+        */
+        currentFilePath = Path.Combine(folderPath, "testImage.png"); 
+        UnityWebRequest imageRequest = UnityWebRequestTexture.GetTexture(link);
+        var operation = imageRequest.SendWebRequest();
+
+        while (!imageRequest.isDone)
+        {
+            progress = operation.progress;
+            yield return new WaitForSeconds(0.25f);
+        }
+        progress = 1f;
+        Texture2D texture = DownloadHandlerTexture.GetContent(imageRequest);
+        byte[] bytes = texture.EncodeToPNG();
+        print(currentFilePath);
+        File.WriteAllBytes(currentFilePath, bytes);
+        imageTexture = texture;
+
+        imageReady = true;
     }
 
     private void ShowImage()
@@ -138,7 +186,7 @@ public class ImportFloorMaps : MonoBehaviour
         WWW www = new WWW(listOfMapsPaths[index]);
         yield return www;
         Texture2D tempTexture = www.texture;
-        floorMapPreview.sprite = Sprite.Create(tempTexture, new Rect(x: 0, y: 0, tempTexture.width, tempTexture.height), new Vector2(x: 0, y: 0));
+        floorMapPreview.sprite = Sprite.Create(tempTexture, new Rect(x: 0, y: 0, 200, 200), new Vector2(x: 0, y: 0));
         floorMapPreview.SetNativeSize();
         //floorMapPreview.rectTransform.sizeDelta = new Vector2(floorMapPreview.rectTransform.sizeDelta.x * 1.7f, floorMapPreview.rectTransform.sizeDelta.y * 1.7f);
         

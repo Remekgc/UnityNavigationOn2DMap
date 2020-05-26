@@ -20,7 +20,7 @@ public class SimpleSQLUserScriptExample : MonoBehaviour
         sqlManager.ExecuteReaderQuery(sqlQuery);
         while (true)
         {
-            if (sqlManager.SelectQueryDone)
+            if (sqlManager.selectQueryDone)
             {
                 //data = sqlManager.selectQueryResult;
                 data = sqlManager.selectQueryResult[0][1].ToString();

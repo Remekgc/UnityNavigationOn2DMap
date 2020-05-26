@@ -13,42 +13,77 @@ public class GPS : MonoBehaviour
     public float updateDistance = 10f;
     public string buildingLatitude;
     public string buildingLongitude;
+    private string oldBuildingLatitude, oldBuildingLongitude;
     public List<Point> points;
     public SimpleSQLUserScriptExample sqlData;
     [SerializeField] protected SQLManager sqlManager;
-    private Point coordinates;
+    public Point coordinates;
+
+    private List<double> distanceToBuilding;
+
+    public bool gpsEnabled = false;
 
     void Start()
     {
-        /*latitude = 51.27639;
+        latitude = 51.27639;
         longitude = 22.551178;
         Instance = this;
         DontDestroyOnLoad(gameObject);
-        StartCoroutine(StartLocationService());*/
+        //StartCoroutine(StartLocationService());
+        coordinates = new Point(latitude, longitude);
         //GetDatabaseData();
 
     }
     private void Update()
     {
-        if (buildingLatitude == ""&& buildingLongitude != sqlData.data)
-            buildingLatitude = sqlData.data;
-        else if (buildingLongitude == "" && buildingLatitude != sqlData.data)
-            buildingLongitude = sqlData.data;
-        if(buildingLongitude != buildingLatitude && buildingLongitude != "" && buildingLatitude != "")
+        if (gpsEnabled)
         {
-            coordinates = new Point(latitude, longitude);
-            var latitudeList = buildingLatitude.Split(';').Select(double.Parse).ToList();
-            List<double> longitudeList = new List<double>(Array.ConvertAll(buildingLongitude.Split(';'), double.Parse));
-            Debug.Log(latitudeList[0]);
-            Debug.Log(longitudeList[0]);
-            List<Point> points = new List<Point>();
-            for (int i = 0; i < latitudeList.Count; i++)
+            //Debug.Log("Count: "+sqlManager.selectQueryResult.Count());
+            if (sqlManager.selectQueryDone)
             {
-                points.Add(new Point(latitudeList[i], longitudeList[i]));
+                //Debug.Log("Test: " + sqlManager.selectQueryResult[0][3]);
+                if (buildingLatitude == "" && buildingLongitude != sqlManager.selectQueryResult[0][3])
+                    buildingLatitude = sqlManager.selectQueryResult[0][3];
+                else if (buildingLongitude == "" && buildingLatitude != sqlManager.selectQueryResult[0][4])
+                    buildingLongitude = sqlManager.selectQueryResult[0][4];
             }
-            Debug.Log(points.Count);
-            Debug.Log(IsInsideBuilding(points, coordinates));
+            if (buildingLongitude != buildingLatitude && buildingLongitude != "" && buildingLatitude != "" && oldBuildingLatitude != buildingLatitude && oldBuildingLongitude != buildingLongitude)
+            {
+                oldBuildingLatitude = buildingLatitude;
+                oldBuildingLongitude = buildingLongitude;
+                var latitudeList = buildingLatitude.Split(';').Select(double.Parse).ToList();
+                List<double> longitudeList = new List<double>(Array.ConvertAll(buildingLongitude.Split(';'), double.Parse));
+
+                List<Point> distanceBuildingPlayer = new List<Point>();
+
+                distanceBuildingPlayer.Add(new Point(((latitudeList[0] + latitudeList[1]) / 2) - latitude, ((longitudeList[0] + longitudeList[1]) / 2) - longitude));
+
+                // Debug.Log(distanceBuildingPlayer[0].latitude+"/"+distanceBuildingPlayer[0].longitude);
+
+                double distance = 0;
+                for (int i = 0; i < distanceBuildingPlayer.Count; i++)
+                {
+                    if (distanceBuildingPlayer[i].latitude > distance)
+                        distance = distanceBuildingPlayer[i].latitude;
+                }
+
+                // Debug.Log(latitudeList[0]);
+                //Debug.Log(longitudeList[0]);
+                List<Point> points = new List<Point>();
+                for (int i = 0; i < latitudeList.Count; i++)
+                {
+                    points.Add(new Point(latitudeList[i], longitudeList[i]));
+                }
+                // Debug.Log(points.Count);
+                //if(points.Count>=4)
+                // Debug.Log(IsInsideBuilding(points, coordinates));
+            }
         }
+    }
+
+    public Point getPosition()
+    {
+        return coordinates;
     }
 
     public void GetDatabaseData()
@@ -58,14 +93,19 @@ public class GPS : MonoBehaviour
 
     public IEnumerator IGetDatabaseData()
     {
+        double minLatitude, maxLatitude, minLongitude, maxLongitude;
+        minLatitude = latitude - 0.02;
+        maxLatitude = latitude + 0.02;
+        minLongitude = longitude - 0.02;
+        maxLongitude = longitude + 0.02;
         Debug.Log("IGetDatabaseData started");
         // tu se wstaw query jakie chcesz
         //sqlManager.ExecuteReaderQuery("SELECT Name FROM Building WHERE Name = 'Adrian_Home'");
         //sqlManager.ExecuteReaderQuery("SELECT * FROM Building");
-        sqlManager.ExecuteReaderQuery("SELECT * FROM Test");
+        sqlManager.ExecuteReaderQuery("SELECT * FROM Building WHERE Latitude BETWEEN '"+minLatitude+"' AND '"+maxLatitude+"' AND Longitude BETWEEN '"+minLongitude+"' AND '"+maxLongitude+"'");
         while (true)
         {
-            if (sqlManager.SelectQueryDone)
+            if (sqlManager.selectQueryDone)
             {
                 foreach (var x in sqlManager.selectQueryResult)
                 {
@@ -74,7 +114,7 @@ public class GPS : MonoBehaviour
                         print(y);
                     }
                 }
-                sqlManager.SelectQueryDone = false;
+                sqlManager.selectQueryDone = false;
                 yield break;
             }
             else
@@ -83,7 +123,6 @@ public class GPS : MonoBehaviour
                 yield return new WaitForSecondsRealtime(2);
             }
         }
-
     }
 
     //tego nie ruszac bo zabije
@@ -132,7 +171,6 @@ public class GPS : MonoBehaviour
             Debug.Log("Unable to determine device location");
             yield break;
         }
-
 
         yield break;
     }
