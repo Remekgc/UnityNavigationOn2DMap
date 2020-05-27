@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Hubert/H_tests.unity
     guid: ceca05f614bacaf4c9985427a5d482a5
+  - enabled: 1
+    path: Assets/Scenes/Main/Main_Scene.unity
+    guid: 93baa33f0712e4c4b88e679c09c6f9db
   m_configObjects: {}

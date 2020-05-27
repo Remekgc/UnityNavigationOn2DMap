@@ -27,10 +27,10 @@ public class TestingComponents : MonoBehaviour
     [SerializeField] private protected Building building;
 
     [Header("Image Loader")]
-    [SerializeField] private protected ImportFloorMaps ImageImporter;
+    [SerializeField] private protected ImportFloorMaps imageImporter;
     [SerializeField] List<Sprite> mapImages = new List<Sprite>();
     [SerializeField] private protected Image mapImage;
-    [SerializeField] bool imageLoading, imageReady = false;
+    [SerializeField] bool imageLoading, imageDownloaded = false;
 
     [Header("Map Object")]
     [SerializeField] private protected MapController mapController;
@@ -45,7 +45,7 @@ public class TestingComponents : MonoBehaviour
     {
         gpsReady = false;
         sqlReady = false;
-        imageReady = false;
+        imageDownloaded = false;
         mapReady = false;
         StartCoroutine(ILoadNavigationComponents());
     }
@@ -76,7 +76,7 @@ public class TestingComponents : MonoBehaviour
                 yield return new WaitForSeconds(1f);
                 continue;
             }
-            else if (!imageReady && building != null)
+            else if (!imageDownloaded && building != null)
             {
                 if (!imageLoading)
                 {
@@ -223,16 +223,18 @@ public class TestingComponents : MonoBehaviour
 
     IEnumerator ILoadMapImage()
     {
-        ImageImporter.DownloadImageFromLink(building.ImageLink);
+        print("ILoadMapImage started");
 
-        while (!ImageImporter.imageReady)
+        imageImporter.listOfMapsLinks.Add(building.ImageLink);
+        imageImporter.DownloadImageFromLink(building.ImageLink, building.ID, building.Name);
+
+        while (!imageImporter.imageReady)
         {
             print("Loading Image...");
             yield return new WaitForSeconds(1f);
         }
-
-        WWW www = new WWW(ImageImporter.currentFilePath);
-        imageReady = true;
+        WWW www = new WWW(imageImporter.currentFilePath);
+        imageDownloaded = true;
 
         yield return www;
         Texture2D tempTexture = www.texture;
@@ -240,6 +242,7 @@ public class TestingComponents : MonoBehaviour
         mapController.map.transform.position = new Vector3(-3.7f, -3.5f, 1f);
         mapReady = true;
 
-        yield break;
+        //yield break;
+
     }
 }
