@@ -9,12 +9,15 @@ public sealed class WifiScanner : Scanner
     public TextMeshProUGUI wifiScanText;
     public bool updateUI = true;
 
-    void Start()
+    void Awake()
     {
         Beacons = new List<Beacon>();
         JavaObject = new AndroidJavaObject("com.example.beaconScannerLibrary.AndroidBeaconScanner");
         JavaObject.Call("setWifiScanReceiver");
-        InvokeRepeating("UpdateUIText", 5, 1);
+    }
+
+    void Start()
+    {
         StartCoroutine(Scan());
     }
 
@@ -26,6 +29,7 @@ public sealed class WifiScanner : Scanner
             {
                 JavaObject.Call("startWifiScan");
                 yield return new WaitForSeconds(ScanFrequency);
+                UpdateUIText();
             }
             else
             {
