@@ -233,19 +233,9 @@ public class TestingComponents : MonoBehaviour
             print("Loading Image...");
             yield return new WaitForSeconds(1f);
         }
-        //WWW www = new WWW(imageImporter.currentFilePath);
-        //imageDownloaded = true;
-
-        //yield return www;
-        //Texture2D tempTexture = www.texture;
-        //mapController.map.GetComponent<SpriteRenderer>().sprite = Sprite.Create(tempTexture, new Rect(x: 0, y: 0, tempTexture.width, tempTexture.height), new Vector2(x: 0, y: 0));
-        //mapController.map.transform.position = new Vector3(-3.7f, -3.5f, 1f);
-        //mapReady = true;
+        imageDownloaded = true;
 
         mapController.map.GetComponent<SpriteRenderer>().sprite = Sprite.Create(imageImporter.imageTexture, new Rect(x: 0, y: 0, imageImporter.imageTexture.width, imageImporter.imageTexture.height), new Vector2(x: 0, y: 0));
         mapReady = true;
-
-        //yield break;
-
     }
 }
