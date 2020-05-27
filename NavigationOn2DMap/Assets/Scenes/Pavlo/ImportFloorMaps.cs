@@ -160,7 +160,7 @@ public class ImportFloorMaps : MonoBehaviour
     //    importImages = null;
     //}
 
-    
+
 
     //IEnumerator DownloadImage(string link)
     //{
@@ -186,7 +186,7 @@ public class ImportFloorMaps : MonoBehaviour
     //    id++;
     //}
 
-    
+
 
     //private void ShowImage()
     //{
@@ -203,13 +203,31 @@ public class ImportFloorMaps : MonoBehaviour
     //    floorMapPreview.sprite = Sprite.Create(tempTexture, new Rect(x: 0, y: 0, 200, 200), new Vector2(x: 0, y: 0));
     //    floorMapPreview.SetNativeSize();
     //    //floorMapPreview.rectTransform.sizeDelta = new Vector2(floorMapPreview.rectTransform.sizeDelta.x * 1.7f, floorMapPreview.rectTransform.sizeDelta.y * 1.7f);
-        
+
     //    if (!floorMapPreview.IsActive())
     //    {
     //        floorMapPreview.gameObject.SetActive(true);
     //    }
     //    showImageCoroutine = null;
     //}
+
+    IEnumerator OpenFloorMap()
+    {
+        int index = int.Parse(EventSystem.current.currentSelectedGameObject.name.Split('_')[0]);
+        print(index);
+        WWW www = new WWW(listOfMapsPaths[index]);
+        yield return www;
+        Texture2D tempTexture = www.texture;
+        floorMapPreview.sprite = Sprite.Create(tempTexture, new Rect(x: 0, y: 0, 200, 200), new Vector2(x: 0, y: 0));
+        floorMapPreview.SetNativeSize();
+        //floorMapPreview.rectTransform.sizeDelta = new Vector2(floorMapPreview.rectTransform.sizeDelta.x * 1.7f, floorMapPreview.rectTransform.sizeDelta.y * 1.7f);
+
+        if (!floorMapPreview.IsActive())
+        {
+            floorMapPreview.gameObject.SetActive(true);
+        }
+        showImageCoroutine = null;
+    }
 
     //public void ChooseFloor()
     //{
