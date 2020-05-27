@@ -235,7 +235,7 @@ public class TestingComponents : MonoBehaviour
         }
         imageDownloaded = true;
 
-        mapController.map.GetComponent<SpriteRenderer>().sprite = Sprite.Create(imageImporter.imageTexture, new Rect(x: 0, y: 0, imageImporter.imageTexture.width, imageImporter.imageTexture.height), new Vector2(x: 0, y: 0));
+        mapController.map.GetComponent<SpriteRenderer>().sprite = Sprite.Create(imageImporter.imageTexture, new Rect(x: 0, y: 0, imageImporter.imageTexture.width, imageImporter.imageTexture.height), new Vector2(x: 0.5f, y: 0.5f));
         mapReady = true;
     }
 }
