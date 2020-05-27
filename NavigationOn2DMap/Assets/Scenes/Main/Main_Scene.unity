@@ -151,7 +151,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   setupReady: 0
-  gps: {fileID: 432197333}
   latitude: 0
   longitude: 0
   selectAccuracy: 0.02
@@ -160,11 +159,11 @@ MonoBehaviour:
   sqlManager: {fileID: 1344859291}
   sqlLoading: 0
   sqlReady: 0
-  ImageImporter: {fileID: 2738172312348098292}
+  imageImporter: {fileID: 2738172312348098292}
   mapImages: []
   mapImage: {fileID: 0}
   imageLoading: 0
-  imageReady: 0
+  imageDownloaded: 0
   mapController: {fileID: 1674028286}
   mapReady: 0
 --- !u!4 &318390916
@@ -646,18 +645,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 411739956}
   m_CullTransparentMesh: 0
---- !u!114 &432197333 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 164902217503840114, guid: 11ae846042762e5428c6c9cc346e4830,
-    type: 3}
-  m_PrefabInstance: {fileID: 164902217373931943}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ac59754719f957242b7e5fcff8157449, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &513255165
 GameObject:
   m_ObjectHideFlags: 0
