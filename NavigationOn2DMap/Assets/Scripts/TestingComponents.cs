@@ -15,8 +15,8 @@ public class TestingComponents : MonoBehaviour
     public bool setupReady = false;
 
     [Header("GPS")]
-    [SerializeField] private protected GPS gps;
-    [SerializeField] float latitude, longitude;
+    [SerializeField] float latitude;
+    [SerializeField] float longitude;
     [SerializeField][Range(0.01f, 0.09f)][Tooltip("This controls how accurate the select from our database will be.")]
     float selectAccuracy = 0.02f;
     [SerializeField] bool gpsLoading, gpsReady = false;
@@ -93,18 +93,14 @@ public class TestingComponents : MonoBehaviour
     private IEnumerator IGetGPSData()
     {
         print("IGetGPSData started");
-        //gps.getLatLog()
+        Point gpsPoint = GPS.Instance.getLocationPoint();
 
         while (true)
         {
-            if (true) //if gps.locatingFinished
+            if (GPS.Instance.locatingFinished) //if gps.locatingFinished
             {
-                // lat = gps.getLatitude()
-                // log = gps.getLongitude()
-                latitude = 51.276419f;
-                longitude = 22.551123f;
-                //latitude = 0;
-                //longitude = 0;
+                latitude = (float)gpsPoint.latitude;
+                longitude = (float)gpsPoint.longitude;
                 gpsReady = true;
                 yield break;
             }

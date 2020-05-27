@@ -7,7 +7,11 @@ using UnityEngine.UI;
 
 public class GPS : MonoBehaviour
 {
-    public static GPS Instance { set; get; }
+    [Header("Remi")]
+    public bool locatingFinished = false;
+
+    public static GPS Instance { get; set; }
+    [Header("Adi")]
     public double latitude;
     public double longitude;
     public float updateDistance = 10f;
@@ -23,12 +27,16 @@ public class GPS : MonoBehaviour
 
     public bool gpsEnabled = false;
 
+    void Awake()
+    {
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
     void Start()
     {
         latitude = 51.27639;
         longitude = 22.551178;
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
         //StartCoroutine(StartLocationService());
         coordinates = new Point(latitude, longitude);
         //GetDatabaseData();
@@ -81,8 +89,12 @@ public class GPS : MonoBehaviour
         }
     }
 
-    public Point getPosition()
+    public Point getLocationPoint()
     {
+        locatingFinished = true;
+        latitude = 51.27639;
+        longitude = 22.551178;
+        coordinates = new Point(latitude, longitude);
         return coordinates;
     }
 
