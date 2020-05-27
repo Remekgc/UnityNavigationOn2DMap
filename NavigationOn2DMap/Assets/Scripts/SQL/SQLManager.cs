@@ -18,8 +18,14 @@ public class SQLManager : MonoBehaviour
 
     public bool threadDone = false, selectQueryDone = true, emptyQueryResult = false;
     [SerializeField] protected TextMeshProUGUI SQLText;
-    public string testData, queryStatement;
+    public string testData;
+
+    // public Thread parameters - Change thouse only at the end in other thread to make the result public.
     public List<List<string>> selectQueryResult = new List<List<string>>();
+
+    // private Thread parameters - Change thouse only in other thread.
+    private string queryStatement;
+    private List<List<string>> _selectQueryResult = new List<List<string>>();
 
     public void ExecuteReaderQuery(string sqlQuery)
     {
@@ -46,15 +52,15 @@ public class SQLManager : MonoBehaviour
             MySqlCommand cmd = new MySqlCommand(queryStatement, sqlConnection); // Creating new sql qurey command
             MySqlDataReader dataReader = cmd.ExecuteReader();
 
-            selectQueryResult.Clear();
+            _selectQueryResult.Clear();
             int listID = 0;
 
             while (dataReader.Read())
             {
-                selectQueryResult.Add(new List<string>());
+                _selectQueryResult.Add(new List<string>());
                 for (int i = 0; i < dataReader.FieldCount; i++)
                 {
-                    selectQueryResult[listID].Add(dataReader[i].ToString());
+                    _selectQueryResult[listID].Add(dataReader[i].ToString());
                 }
                 listID++;
             }
@@ -70,6 +76,7 @@ public class SQLManager : MonoBehaviour
         {
             print("Reader Querry error: " + ex);
         }
+        selectQueryResult = _selectQueryResult;
         selectQueryDone = true;
     }
 

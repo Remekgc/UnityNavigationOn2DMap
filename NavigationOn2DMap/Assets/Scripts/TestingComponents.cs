@@ -230,6 +230,7 @@ public class TestingComponents : MonoBehaviour
             print("Loading Image...");
             yield return new WaitForSeconds(1f);
         }
+
         WWW www = new WWW(ImageImporter.currentFilePath);
         imageReady = true;
 
