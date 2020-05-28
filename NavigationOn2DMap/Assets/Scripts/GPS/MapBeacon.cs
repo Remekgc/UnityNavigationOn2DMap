@@ -7,6 +7,7 @@ public class MapBeacon
     public int ID;
     public string RoomName;
     public string SSID;
+    public int RSSI;
     public Vector2 MapPos;
     public List<BeaconSensor> Sensors = new List<BeaconSensor>();
 

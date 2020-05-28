@@ -9,6 +9,7 @@ public class SimpleSQLUserScriptExample : MonoBehaviour
     public string data;
     public TextMeshProUGUI SQLText;
     public string sqlQuery;
+
     public void GetDatabaseData()
     {
         StartCoroutine(IGetDatabaseData());

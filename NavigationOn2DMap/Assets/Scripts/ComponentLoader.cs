@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
-public class TestingComponents : MonoBehaviour
+public class ComponentLoader : MonoBehaviour
 {
     /* TODO: Here we are going to test the functionality and do everything step by step
     * 1: Get the GPS Data and select everything by it
@@ -12,6 +13,10 @@ public class TestingComponents : MonoBehaviour
     * 3: Load the image into the scene as a map with all beacons and show where we are based on wifi scan
     */
     [Header("Navigation Components")]
+    [SerializeField] private protected Button startButton;
+    [SerializeField] private protected TextMeshProUGUI buildingNameTextField;
+    [SerializeField] private protected TextMeshProUGUI beaconTextField;
+    [SerializeField] private protected WifiScanner wifiScanner;
     public bool setupReady = false;
 
     [Header("GPS")]
@@ -24,7 +29,8 @@ public class TestingComponents : MonoBehaviour
     [Header("SQL")]
     [SerializeField] private protected SQLManager sqlManager;
     [SerializeField] bool sqlLoading, sqlReady = false;
-    [SerializeField] private protected Building building;
+    [SerializeField] public Building building;
+    [SerializeField] private protected Building _building;
 
     [Header("Image Loader")]
     [SerializeField] private protected ImportFloorMaps imageImporter;
@@ -38,16 +44,28 @@ public class TestingComponents : MonoBehaviour
 
     void Start()
     {
-        LoadNavigation();
+        //LoadNavigation();
+        //mapController.PlaceDot(-13, -12);
     }
 
     public void LoadNavigation()
+    {
+        buildingNameTextField.text = "Loading...";
+        beaconTextField.text = "Loading...";
+        startButton.interactable = false;
+        resetLoadingStates();
+        StartCoroutine(ILoadNavigationComponents());
+    }
+
+    private void resetLoadingStates()
     {
         gpsReady = false;
         sqlReady = false;
         imageDownloaded = false;
         mapReady = false;
-        StartCoroutine(ILoadNavigationComponents());
+        setupReady = false;
+        building = null;
+        _building = null;
     }
 
     private IEnumerator ILoadNavigationComponents()
@@ -76,7 +94,7 @@ public class TestingComponents : MonoBehaviour
                 yield return new WaitForSeconds(1f);
                 continue;
             }
-            else if (!imageDownloaded && building != null)
+            else if (!imageDownloaded && _building != null)
             {
                 if (!imageLoading)
                 {
@@ -86,7 +104,15 @@ public class TestingComponents : MonoBehaviour
                 yield return new WaitForSeconds(1f);
                 continue;
             }
-            navigationLoaded = true;
+            startButton.interactable = true;
+
+            if (_building != null)
+            {
+                building = _building;
+                navigationLoaded = true;
+                setupReady = true;
+                wifiScanner.ScanEnabled = true;
+            }
         }
     }
 
@@ -138,17 +164,16 @@ public class TestingComponents : MonoBehaviour
                 float dist = 0f;
                 foreach (var b in buildingsToCompare)
                 {
-                    if (building == null)
+                    if (_building == null)
                     {
-                        building = b;
+                        _building = b;
                         dist = Vector2.Distance(b.Coordinates, new Vector2(lat, log));
                     }
-                    else if (Vector2.Distance(building.Coordinates, b.Coordinates) < dist)
+                    else if (Vector2.Distance(_building.Coordinates, b.Coordinates) < dist)
                     {
-                        building = b;
+                        _building = b;
                     }
                 }
-                print(building.Name);
 
                 sqlManager.selectQueryDone = false;
                 buildingDataReady = true;
@@ -160,24 +185,26 @@ public class TestingComponents : MonoBehaviour
             }
         }
 
-        bool mapBeaconsDataReady = false;
-        if (building != null) sqlManager.ExecuteReaderQuery("SELECT * FROM Beacon WHERE BuildingID = " + building.ID);
+        if (_building != null) {
+            sqlManager.ExecuteReaderQuery("SELECT * FROM Beacon WHERE BuildingID = " + _building.ID);
+            buildingNameTextField.text = _building.Name;
+        }
 
+        bool mapBeaconsDataReady = false;
         while (!mapBeaconsDataReady && !sqlManager.emptyQueryResult)
         {
             if (sqlManager.selectQueryDone)
             {
                 foreach (var beaconData in sqlManager.selectQueryResult)
                 {
-                    building.Beacons.Add(
+                    _building.Beacons.Add(
                         new MapBeacon(
                             int.Parse(beaconData[0]),
-                            beaconData[1],
-                            new Vector2(int.Parse(beaconData[2]), int.Parse(beaconData[3])),
-                            beaconData[4])
+                            beaconData[4],
+                            new Vector2(float.Parse(beaconData[2]), float.Parse(beaconData[3])),
+                            beaconData[1])
                         );
                 }
-
                 mapBeaconsDataReady = true;
                 sqlManager.selectQueryDone = false;
             }
@@ -190,7 +217,7 @@ public class TestingComponents : MonoBehaviour
 
         if (!sqlManager.emptyQueryResult)
         {
-            foreach (var beacon in building.Beacons)
+            foreach (var beacon in _building.Beacons)
             {
                 bool beaconSensorsReady = false;
                 sqlManager.ExecuteReaderQuery("SELECT * FROM Sensor WHERE BeaconID = " + beacon.ID);
@@ -218,15 +245,14 @@ public class TestingComponents : MonoBehaviour
 
         print("SQL Ready");
         sqlReady = true;
-        yield break;
     }
 
     IEnumerator ILoadMapImage()
     {
         print("ILoadMapImage started");
 
-        imageImporter.listOfMapsLinks.Add(building.ImageLink);
-        imageImporter.DownloadImageFromLink(building.ImageLink, building.ID, building.Name);
+        imageImporter.listOfMapsLinks.Add(_building.ImageLink);
+        imageImporter.DownloadImageFromLink(_building.ImageLink, _building.ID, _building.Name);
 
         while (!imageImporter.imageReady)
         {

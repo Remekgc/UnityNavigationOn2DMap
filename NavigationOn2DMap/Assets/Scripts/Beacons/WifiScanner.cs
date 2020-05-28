@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 using TMPro;
+using System;
 
 public sealed class WifiScanner : Scanner
 {
     public TextMeshProUGUI wifiScanText;
-    public bool updateUI = true;
+    public bool updateUI = false;
+    public List<Action> functionsToRunAfterScan = new List<Action>();
 
     void Awake()
     {
@@ -30,6 +32,7 @@ public sealed class WifiScanner : Scanner
                 JavaObject.Call("startWifiScan");
                 yield return new WaitForSeconds(ScanFrequency);
                 UpdateUIText();
+                runAfterScanFunctions();
             }
             else
             {
@@ -43,10 +46,18 @@ public sealed class WifiScanner : Scanner
         if (updateUI)
         {
             wifiScanText.text = "";
-            foreach (var item in Beacons)
+            foreach (var beacon in Beacons)
             {
-                wifiScanText.text += item.SSID + " : " + item.RSSI + "\n";
+                wifiScanText.text += beacon.SSID + " : " + beacon.RSSI + "\n";
             }
+        }
+    }
+
+    private void runAfterScanFunctions()
+    {
+        foreach (var function in functionsToRunAfterScan)
+        {
+            function();
         }
     }
 }

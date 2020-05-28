@@ -12,25 +12,19 @@ public class MapController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        PlaceDot(2, 1); // tutaj dla kazdej mapy z db jakies koordynaty gdzie postawic kropke?
-        PlaceMap(DEBUG_MAPSPRITE, -5, 5, -5, 5); 
+        PlaceMap(DEBUG_MAPSPRITE, -5, 5, -5, 5);
     }
 
-    // Update is called once per frame
-    void Update()
+    public void PlaceDot(float x, float y)
     {
-
-    }
-
-    void PlaceDot(float x, float y)
-    {
-        dot = Instantiate(dotPrefab);
+        if (dot == null) dot = Instantiate(dotPrefab, transform);
         dot.transform.position = new Vector3(x, y, 2); //cos zjebane z tym 2d albo warstwami
     }
 
-    void RemoveDot()
+    public void RemoveDot()
     {
         Destroy(dot);
+        dot = null;
     }
 
     void PlaceMap(Sprite map, float minX, float maxX, float minY, float maxY)
@@ -42,7 +36,4 @@ public class MapController : MonoBehaviour
         cameraController.maxY = maxY;
 
     }
-
-
-
 }

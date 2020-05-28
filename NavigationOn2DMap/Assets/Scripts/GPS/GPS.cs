@@ -92,8 +92,8 @@ public class GPS : MonoBehaviour
     public Point getLocationPoint()
     {
         locatingFinished = true;
-        latitude = 51.27639;
-        longitude = 22.551178;
+        latitude = 51.228665;
+        longitude = 22.002563;
         coordinates = new Point(latitude, longitude);
         return coordinates;
     }
