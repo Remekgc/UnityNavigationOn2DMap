@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,6 +24,8 @@ public class GPS : MonoBehaviour
     [SerializeField] protected SQLManager sqlManager;
     public Point coordinates;
 
+    public GameObject testNameLabel;
+
     private List<double> distanceToBuilding;
 
     public bool gpsEnabled = false;
@@ -35,9 +38,9 @@ public class GPS : MonoBehaviour
 
     void Start()
     {
-        latitude = 51.27639;
-        longitude = 22.551178;
-        //StartCoroutine(StartLocationService());
+        //latitude = 51.27639;
+        //longitude = 22.551178;
+        StartCoroutine(StartLocationService());
         coordinates = new Point(latitude, longitude);
         //GetDatabaseData();
 
@@ -92,8 +95,8 @@ public class GPS : MonoBehaviour
     public Point getLocationPoint()
     {
         locatingFinished = true;
-        latitude = 51.228665;
-        longitude = 22.002563;
+        //latitude = 51.228665;
+        //longitude = 22.002563;
         coordinates = new Point(latitude, longitude);
         return coordinates;
     }
@@ -183,6 +186,11 @@ public class GPS : MonoBehaviour
             Debug.Log("Unable to determine device location");
             yield break;
         }
+
+        latitude = Input.location.lastData.latitude;
+        longitude = Input.location.lastData.longitude;
+
+        testNameLabel.GetComponent<TextMeshProUGUI>().text = latitude + " And " + longitude;
 
         yield break;
     }
