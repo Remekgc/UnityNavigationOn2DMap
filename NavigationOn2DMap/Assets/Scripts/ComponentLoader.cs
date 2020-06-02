@@ -119,15 +119,16 @@ public class ComponentLoader : MonoBehaviour
     private IEnumerator IGetGPSData()
     {
         print("IGetGPSData started");
-        Point gpsPoint = GPS.Instance.getLocationPoint();
+        GPS.Instance.getLocationPoint();
 
         while (true)
         {
             if (GPS.Instance.locatingFinished) //if gps.locatingFinished
             {
-                latitude = (float)gpsPoint.latitude;
-                longitude = (float)gpsPoint.longitude;
+                latitude = GPS.Instance.coordinates.latitude;
+                longitude = GPS.Instance.coordinates.longitude;
                 gpsReady = true;
+                wifiScanner.UpdateUI = true;
                 yield break;
             }
             else

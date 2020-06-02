@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Point
 {
-    public double latitude;
-    public double longitude;
-    public Point(double latitude, double longitude)
+    public float latitude;
+    public float longitude;
+    public Point(float latitude, float longitude)
     {
         this.latitude = latitude;
         this.longitude = longitude;

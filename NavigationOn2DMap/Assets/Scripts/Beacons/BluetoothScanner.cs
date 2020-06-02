@@ -5,8 +5,8 @@ using UnityEngine;
 
 public sealed class BluetoothScanner : Scanner
 {
-    public TextMeshProUGUI bluetoothScanText;
-    public bool updateUI = true;
+    public TextMeshProUGUI BluetoothScanText;
+    public bool UpdateUI = true;
 
     void Start()
     {
@@ -35,12 +35,12 @@ public sealed class BluetoothScanner : Scanner
 
     public void UpdateUIText()
     {
-        if (updateUI)
+        if (UpdateUI)
         {
-            bluetoothScanText.text = "";
+            BluetoothScanText.text = "";
             foreach (var item in Beacons)
             {
-                bluetoothScanText.text += item.SSID + " : " + item.RSSI + "\n";
+                BluetoothScanText.text += item.SSID + " : " + item.RSSI + "\n";
             }
         }
     }

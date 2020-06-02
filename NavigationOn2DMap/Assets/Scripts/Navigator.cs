@@ -35,26 +35,24 @@ public class Navigator : MonoBehaviour
         {
             mapController.RemoveDot();
             beaconListTextField.text = "No beacons around you found.";
-            closestBeacon = null;
         }
     }
 
     private void SortBeacons()
     {
+        closestBeacon = null;
+
         foreach (var mapBeacon in componentLoader.building.Beacons)
         {
-            beaconListTextField.text = "1";
             foreach (var beacon in wifiScanner.Beacons)
             {
                 beaconListTextField.text = mapBeacon.SSID + " != " + beacon.SSID;
                 if (mapBeacon.SSID == beacon.SSID && closestBeacon == null)
                 {
-                    beaconListTextField.text = "3";
                     updateClosestBeacon(mapBeacon, beacon);
                 }
                 else if (mapBeacon.SSID == beacon.SSID && beacon.RSSI < closestBeacon.RSSI)
                 {
-                    beaconListTextField.text = "4";
                     updateClosestBeacon(mapBeacon, beacon);
                 }
             }

@@ -13,8 +13,8 @@ public class GPS : MonoBehaviour
 
     public static GPS Instance { get; set; }
     [Header("Adi")]
-    public double latitude;
-    public double longitude;
+    public float latitude;
+    public float longitude;
     public float updateDistance = 10f;
     public string buildingLatitude;
     public string buildingLongitude;
@@ -24,7 +24,7 @@ public class GPS : MonoBehaviour
     [SerializeField] protected SQLManager sqlManager;
     public Point coordinates;
 
-    public GameObject testNameLabel;
+    public TextMeshProUGUI gpsResultsUI;
 
     private List<double> distanceToBuilding;
 
@@ -40,12 +40,13 @@ public class GPS : MonoBehaviour
     {
         //latitude = 51.27639;
         //longitude = 22.551178;
-        StartCoroutine(StartLocationService());
+        //StartCoroutine(StartLocationService());
         coordinates = new Point(latitude, longitude);
         //GetDatabaseData();
 
     }
-    private void Update()
+
+    /*private void Update()
     {
         if (gpsEnabled)
         {
@@ -90,15 +91,14 @@ public class GPS : MonoBehaviour
                 // Debug.Log(IsInsideBuilding(points, coordinates));
             }
         }
-    }
+    }*/
 
-    public Point getLocationPoint()
+    public void getLocationPoint()
     {
-        locatingFinished = true;
+        locatingFinished = false;
+        StartCoroutine(StartLocationService());
         //latitude = 51.228665;
         //longitude = 22.002563;
-        coordinates = new Point(latitude, longitude);
-        return coordinates;
     }
 
     public void GetDatabaseData()
@@ -117,7 +117,7 @@ public class GPS : MonoBehaviour
         // tu se wstaw query jakie chcesz
         //sqlManager.ExecuteReaderQuery("SELECT Name FROM Building WHERE Name = 'Adrian_Home'");
         //sqlManager.ExecuteReaderQuery("SELECT * FROM Building");
-        sqlManager.ExecuteReaderQuery("SELECT * FROM Building WHERE Latitude BETWEEN '"+minLatitude+"' AND '"+maxLatitude+"' AND Longitude BETWEEN '"+minLongitude+"' AND '"+maxLongitude+"'");
+        sqlManager.ExecuteReaderQuery("SELECT * FROM Building WHERE Latitude BETWEEN '" + minLatitude + "' AND '" + maxLatitude + "' AND Longitude BETWEEN '" + minLongitude + "' AND '" + maxLongitude + "'");
         while (true)
         {
             if (sqlManager.selectQueryDone)
@@ -162,37 +162,43 @@ public class GPS : MonoBehaviour
     //tego tez >.>
     private IEnumerator StartLocationService()
     {
-        if(!Input.location.isEnabledByUser)
+        //gpsResultsUI.text = "Starting GPS";
+
+        if (!Input.location.isEnabledByUser)
         {
             Debug.Log("User has not enabled GPS");
+            //gpsResultsUI.text = "User has not enabled GPS";
             yield break;
         }
 
         Input.location.Start(updateDistance);
         int maxWait = 20;
+
         while(Input.location.status == LocationServiceStatus.Initializing && maxWait > 0)
         {
+            //gpsResultsUI.text = "Initializing GPS";
             yield return new WaitForSeconds(1);
             maxWait--;
         }
+
         if(maxWait <= 0)
         {
+            //gpsResultsUI.text = "Timed Out";
             Debug.Log("Timed out");
             yield break;
         }
 
         if(Input.location.status == LocationServiceStatus.Failed)
         {
+            //gpsResultsUI.text = "Unable to determine device location";
             Debug.Log("Unable to determine device location");
             yield break;
         }
 
-        latitude = Input.location.lastData.latitude;
-        longitude = Input.location.lastData.longitude;
+        coordinates = new Point(Input.location.lastData.latitude, Input.location.lastData.longitude);
+        gpsResultsUI.text = "Latitude: " + coordinates.latitude + "\nLongitude: " + coordinates.longitude;
 
-        testNameLabel.GetComponent<TextMeshProUGUI>().text = latitude + " And " + longitude;
-
-        yield break;
+        locatingFinished = true;
     }
 
 }

@@ -43,30 +43,31 @@ public abstract class Scanner : MonoBehaviour, IScanner
             }
         }
         ssid = temp;
+        Beacons.Add(new Beacon(ssid, rssi));
 
         // Filter the list
-        if (Beacons.Count > 0 && (ssid.Contains(Filter) || Filter == ""))
-        {
-            for (int i = 0; i < Beacons.Count; i++)
-            {
-                if (Beacons[i].SSID == ssid)
-                {
-                    if (Beacons[i].RSSI != rssi)
-                    {
-                        Beacons[i].RSSI = rssi;
-                    }
-                    break;
-                }
-                else if (i == Beacons.Count - 1)
-                {
-                    Beacons.Add(new Beacon(ssid, rssi));
-                }
-            }
-        }
-        else if(ssid.Contains(Filter) || Filter == "")
-        {
-            Beacons.Add(new Beacon(ssid, rssi));
-        }
+        //if (Beacons.Count > 0 && (ssid.Contains(Filter) || Filter == ""))
+        //{
+        //    for (int i = 0; i < Beacons.Count; i++)
+        //    {
+        //        if (Beacons[i].SSID == ssid)
+        //        {
+        //            if (Beacons[i].RSSI != rssi)
+        //            {
+        //                Beacons[i].RSSI = rssi;
+        //            }
+        //            break;
+        //        }
+        //        else if (i == Beacons.Count - 1)
+        //        {
+        //            Beacons.Add(new Beacon(ssid, rssi));
+        //        }
+        //    }
+        //}
+        //else if(ssid.Contains(Filter) || Filter == "")
+        //{
+        //    Beacons.Add(new Beacon(ssid, rssi));
+        //}
     }
 
 }

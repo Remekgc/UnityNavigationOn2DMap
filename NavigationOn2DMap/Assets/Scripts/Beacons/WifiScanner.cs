@@ -7,8 +7,9 @@ using System;
 
 public sealed class WifiScanner : Scanner
 {
-    public TextMeshProUGUI wifiScanText;
-    public bool updateUI = false;
+    public TextMeshProUGUI WifiScanText;
+    public TextMeshProUGUI WifiCounter;
+    public bool UpdateUI = false;
     public List<Action> functionsToRunAfterScan = new List<Action>();
 
     void Awake()
@@ -29,8 +30,15 @@ public sealed class WifiScanner : Scanner
         {
             if (ScanEnabled)
             {
+                Beacons.Clear(); // Clear the beacon list
+
                 JavaObject.Call("startWifiScan");
                 yield return new WaitForSeconds(ScanFrequency);
+
+                int t = int.Parse(WifiCounter.text);
+                t++;
+                WifiCounter.text = t.ToString();
+
                 UpdateUIText();
                 runAfterScanFunctions();
             }
@@ -43,12 +51,12 @@ public sealed class WifiScanner : Scanner
 
     public void UpdateUIText()
     {
-        if (updateUI)
+        if (UpdateUI)
         {
-            wifiScanText.text = "";
+            WifiScanText.text = "";
             foreach (var beacon in Beacons)
             {
-                wifiScanText.text += beacon.SSID + " : " + beacon.RSSI + "\n";
+                WifiScanText.text += beacon.SSID + " : " + beacon.RSSI + "\n";
             }
         }
     }
