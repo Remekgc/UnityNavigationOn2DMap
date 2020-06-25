@@ -53,11 +53,11 @@ public class ComponentLoader : MonoBehaviour
         buildingNameTextField.text = "Loading...";
         beaconTextField.text = "Loading...";
         startButton.interactable = false;
-        resetLoadingStates();
+        ResetLoadingStates();
         StartCoroutine(ILoadNavigationComponents());
     }
 
-    private void resetLoadingStates()
+    private void ResetLoadingStates()
     {
         gpsReady = false;
         sqlReady = false;
@@ -229,7 +229,7 @@ public class ComponentLoader : MonoBehaviour
                     {
                         foreach (var sensorData in sqlManager.selectQueryResult)
                         {
-                            beacon.Sensors.Add(new BeaconSensor(sensorData[1], float.Parse(sensorData[2])));
+                            beacon.Sensors.Add(new BeaconSensor(sensorData[1], sensorData[2]));
                         }
 
                         sqlManager.selectQueryDone = false;

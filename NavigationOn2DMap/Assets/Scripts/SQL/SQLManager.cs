@@ -31,10 +31,11 @@ public class SQLManager : MonoBehaviour
     {
         if (selectQueryThread != null && selectQueryThread.IsAlive) // Checking if thread is defined and alive
         {
-            print("Query already executing, please wait for the result before running again.");
+            Debug.Log("Query already executing, please wait for the result before running again.");
         }
         else // Otherwise creating a new thread and running it
         {
+            Debug.Log("Starting new sql query.");
             queryStatement = sqlQuery;
             emptyQueryResult = false;
             selectQueryDone = false;
@@ -52,7 +53,9 @@ public class SQLManager : MonoBehaviour
             MySqlCommand cmd = new MySqlCommand(queryStatement, sqlConnection); // Creating new sql qurey command
             MySqlDataReader dataReader = cmd.ExecuteReader();
 
+            selectQueryResult.Clear();
             _selectQueryResult.Clear();
+
             int listID = 0;
 
             while (dataReader.Read())
@@ -74,7 +77,7 @@ public class SQLManager : MonoBehaviour
         }
         catch (Exception ex)
         {
-            print("Reader Querry error: " + ex);
+            Debug.Log("Reader Querry error: " + ex);
         }
         selectQueryResult = _selectQueryResult;
         selectQueryDone = true;

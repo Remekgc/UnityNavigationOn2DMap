@@ -17,46 +17,53 @@ public class SensorDataManager : MonoBehaviour
         wifiScanner.functionsToRunAfterScan.Add(RefreshBeaconData);
     }
 
+    void Start()
+    {
+        StartCoroutine(UpdateUI_SensorText());
+    }
+
     void RefreshBeaconData()
     {
         if (navigator.closestBeacon != null)
         {
-            sensorText.text = "Step 1\n";
             StartCoroutine(IGetSensorDataFromDatabase());
         }
     }
 
     IEnumerator IGetSensorDataFromDatabase()
     {
-        sensorText.text = "Step 2(Beacon ID:" + navigator.closestBeacon.ID + ")\n";
         sqlManager.ExecuteReaderQuery("SELECT * FROM Sensor WHERE BeaconID = " + navigator.closestBeacon.ID);
 
-        while (sqlManager.selectQueryDone)
+        while (!sqlManager.selectQueryDone)
         {
-            yield return new WaitForSeconds(1f); // Wait unitill the select query is done.
+            yield return new WaitForSeconds(2f); // Wait unitill the select query is done.
+            Debug.Log("Waiting for sensor data to refresh");
         }
 
         UpdateSenorValues();
-        UpdateUI_SensorText();
     }
 
     private void UpdateSenorValues()
     {
-        sensorText.text = "Step 3(Select query list size " + sqlManager.selectQueryResult.Count + ")\n";
         for (int i = 0; i < sqlManager.selectQueryResult.Count; i++)
         {
-            //navigator.closestBeacon.Sensors[i].Value = float.Parse(sqlManager.selectQueryResult[i][2]);
-            sensorText.text += "Step 3.1, Sensor val:" + sqlManager.selectQueryResult[i][2] + "\n";
+            navigator.closestBeacon.Sensors[i].Value = sqlManager.selectQueryResult[i][2];
         }
     }
 
-    private void UpdateUI_SensorText()
+    IEnumerator UpdateUI_SensorText()
     {
-        sensorText.text = "Step 4\n";
-        sensorText.text = " ";
-        foreach (var sensor in navigator.closestBeacon.Sensors)
+        while (true)
         {
-            sensorText.text += sensor.Name + ": " + sensor.Value + "\n";
+            if (navigator.closestBeacon != null)
+            {
+                sensorText.text = " ";
+                foreach (var sensor in navigator.closestBeacon.Sensors)
+                {
+                    sensorText.text += sensor.Name + ": " + sensor.Value + "\n";
+                }
+            }
+            yield return new WaitForSeconds(1f);
         }
     }
 }

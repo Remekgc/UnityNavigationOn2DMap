@@ -5,9 +5,9 @@ using UnityEngine;
 public class BeaconSensor
 {
     public string Name;
-    public float Value;
+    public string Value;
 
-    public BeaconSensor(string name = "None", float value = 0f)
+    public BeaconSensor(string name = "None", string value = "")
     {
         Name = name;
         Value = value;

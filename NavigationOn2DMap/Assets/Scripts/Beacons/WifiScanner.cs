@@ -33,14 +33,17 @@ public sealed class WifiScanner : Scanner
                 Beacons.Clear(); // Clear the beacon list
 
                 JavaObject.Call("startWifiScan");
-                yield return new WaitForSeconds(ScanFrequency);
+                yield return new WaitForSeconds(ScanFrequency / 2);
+
+                UpdateWifiListOnUI();
+                RunAfterScanFunctions();
 
                 int t = int.Parse(WifiCounter.text);
                 t++;
+
                 WifiCounter.text = t.ToString();
 
-                UpdateUIText();
-                runAfterScanFunctions();
+                yield return new WaitForSeconds(ScanFrequency / 2);
             }
             else
             {
@@ -49,7 +52,7 @@ public sealed class WifiScanner : Scanner
         }
     }
 
-    public void UpdateUIText()
+    public void UpdateWifiListOnUI()
     {
         if (UpdateUI)
         {
@@ -61,7 +64,7 @@ public sealed class WifiScanner : Scanner
         }
     }
 
-    private void runAfterScanFunctions()
+    private void RunAfterScanFunctions()
     {
         foreach (var function in functionsToRunAfterScan)
         {
